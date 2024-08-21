@@ -1,76 +1,36 @@
-import React, { useState } from 'react';
-import { View,
-  Text,
-  TextInput,
-  Image,
-  SafeAreaView,
-  StyleSheet,
-  TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
+import * as Font from 'expo-font';
+import Login from './components/pages/Login';
 
-const App = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  
+export default function App() {
+  const [fontsLoaded, setFontsLoaded] = useState(false);
+
+  useEffect(() => {
+    async function loadFonts() {
+      await Font.loadAsync({
+        'Oswald': require('./assets/fonts/Oswald-Regular.ttf'),
+      });
+      setFontsLoaded(true);
+    }
+    loadFonts();
+  }, []);
+
+  if (!fontsLoaded) {
+    return <ActivityIndicator />;
+  }
+
   return (
-    <SafeAreaView style={styles.wrapper}>
-      <View style={styles.container}>
-        <Image></Image>
-        <Text style={styles.welcome}>Welcome back!</Text>
-        <Text>Login to begin</Text>
-        <TextInput
-          style={styles.input}
-          onChangeText={setEmail}
-          value={email}
-          placeholder='Enter your primary email here'
-          autoCorrect={false}
-          keyboardType='email-address'
-        />
-      <View style={styles.passwordContainer}>
-        <TextInput
-          style={styles.input}
-          onChangeText={setPassword}
-          value={password}
-          placeholder='●●●●●●●●'
-        />
-      </View>
-   
-        
-      
+    <View style={styles.container}>
+      <Login />
     </View>
-    </SafeAreaView>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
-  wrapper: {
-    flex: 1
-  },
   container: {
-    backgroundColor: '#FFFFFF',
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center'
-  },
-  passwordContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'center',
-    width: '100%'
+    alignItems: 'center',
   },
-  input: {
-    height: 40,
-    width: '60%',
-    margin: 12,
-    borderWidth: 1,
-    padding: 10,
-    borderRadius: 5,
-  },
-  toggleButton: {
-    marginLeft: -50,
-    padding: 10
-  },
-  welcome: {
-    fontWeight: 'bold'
-  }
-})
-export default App;
+});
