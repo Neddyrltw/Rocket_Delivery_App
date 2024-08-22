@@ -183,6 +183,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#333',
     textAlign: 'left',
+    fontFamily: 'Oswald',
   },
   errorText: {
     color: 'red',
