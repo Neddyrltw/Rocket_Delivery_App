@@ -1,7 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
+import { ActivityIndicator, SafeAreaView, StyleSheet, View } from 'react-native';
 import * as Font from 'expo-font';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
 import Login from './components/pages/Login';
+import Restaurants from './components/pages/Restaurants';
+import Header from './components/ui/Header';
+import Footer from './components/ui/Footer';
+
+const Stack = createNativeStackNavigator();
 
 export default function App() {
   const [fontsLoaded, setFontsLoaded] = useState(false);
@@ -21,16 +29,32 @@ export default function App() {
   }
 
   return (
-    <View style={styles.container}>
-      <Login />
-    </View>
+    <NavigationContainer>
+      <SafeAreaView style={styles.container}>
+        <Stack.Navigator screenOptions={{ headerShown: false}}>
+            <Stack.Screen name="Login" component={Login} />
+            <Stack.Screen name="Main" component={MainScreen} />
+        </Stack.Navigator>
+      </SafeAreaView>
+    </NavigationContainer>
   );
+}
+
+const MainScreen = () => {
+    return(
+        <View style={styles.mainContainer}>
+            <Header />
+            <Restaurants />
+            <Footer />
+        </View>
+    );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
+  mainContainer: {
+    flex: 1,
+  }
 });

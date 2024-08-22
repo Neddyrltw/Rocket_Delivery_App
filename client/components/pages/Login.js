@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import Constants from 'expo-constants'
+import Constants from 'expo-constants';
+import { useNavigation } from '@react-navigation/native';
 import {
   Alert,
   Image,
@@ -20,6 +21,7 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
+  const navigation = useNavigation();
   const apiUrl = Constants.expoConfig?.extra?.apiUrl;
 
 
@@ -42,6 +44,7 @@ const Login = () => {
     if (data.success) {
       Alert.alert('Success', 'Logged in successfully!');
       setErrorMessage('');
+      navigation.navigate('Main');
     } else {
       showError('Invalid email or password.')
     }
@@ -118,7 +121,7 @@ const styles = StyleSheet.create({
   },
   wrapper: {
     flex: 1,
-    width: '90%',
+    width: '100%',
     backgroundColor: '#FFFFFF',
   },
   logoContainer: {
