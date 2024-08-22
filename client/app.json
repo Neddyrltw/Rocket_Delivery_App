@@ -28,6 +28,9 @@
     },
     "plugins": [
       "expo-font"
-    ]
+    ],
+    "extra": {
+      "apiUrl": "https://6eeb-47-202-128-105.ngrok-free.app"
+    }
   }
 }

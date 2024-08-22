@@ -1,24 +1,63 @@
 import React, { useState } from 'react';
+import Constants from 'expo-constants'
 import {
-  View,
+  Alert,
+  Image,
+  SafeAreaView,
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  Image,
-  SafeAreaView,
-  StyleSheet 
+  View,
 } from 'react-native';
 
 import MyAppHeaderText from '../ui/MyAppHeaderText';
 import logo from '../../assets/logo.png';
 
+
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+
+  const apiUrl = Constants.expoConfig?.extra?.apiUrl;
+
 
   const handleLoginPress = () => {
-    console.log('Login button pressed');
-  }
+    if (!email || !password) {
+      showError('Please enter valid email and password.')
+      return;
+    }
+
+  fetch(`${apiUrl}/api/login`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ email, password }),
+  })
+
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      Alert.alert('Success', 'Logged in successfully!');
+      setErrorMessage('');
+    } else {
+      showError('Invalid email or password.')
+    }
+  })
+  .catch (error => {
+    console.error('Error during login: ', error)
+    showError('Something went wrong. Please try again.')
+  });
+};
+
+const showError = (message) => {
+  setErrorMessage(message);
+  setTimeout(() => {
+    setErrorMessage('');
+  }, 1000);
+};
   
   return (
     <SafeAreaView style={styles.wrapper}>
@@ -52,6 +91,7 @@ const Login = () => {
               secureTextEntry
             />
           </View>
+          {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
           <TouchableOpacity style={styles.button} onPress={handleLoginPress}>
             <Text style={styles.buttonText}>LOG IN</Text>
           </TouchableOpacity>
@@ -108,14 +148,14 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     width: '100%',
-    alignItems: 'flex-start', // Align items to the start of the container
-    marginBottom: 15, // Space between input fields
+    alignItems: 'flex-start',
+    marginBottom: 15, 
   },
   input: {
     height: 40,
     width: '100%',
     maxWidth: 500,
-    marginVertical: 10, // Adjusted spacing between input and label
+    marginVertical: 10,
     borderWidth: 1,
     borderColor: '#CCC',
     paddingHorizontal: 10,
@@ -140,6 +180,12 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#333',
     textAlign: 'left',
+  },
+  errorText: {
+    color: 'red',
+    marginBottom: 10,
+    textAlign: 'center',
+    width: '100%',
   },
 });
 
