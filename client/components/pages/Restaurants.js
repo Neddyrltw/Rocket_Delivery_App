@@ -1,16 +1,44 @@
 import React, { useState, useEffect } from 'react';
-import Constants from 'expo-constants'
-
+import Constants from 'expo-constants';
+import ModalSelector from 'react-native-modal-selector';
 import {
     SafeAreaView,
-    FlatList,
+    ScrollView,
     Text,
     StyleSheet,
     View,
-    Image
 } from 'react-native';
 
+import RestaurantCard from '../ui/RestaurantCard';
+
 const Restaurants = () => {
+    const [restaurants, setRestaurants] = useState([]);
+    const [rating, setRating] = useState(null);
+    const [price, setPrice] = useState(null);
+
+    const apiUrl = Constants.expoConfig?.extra?.apiUrl;
+
+    const ratingOptions = [
+        { key: 1, label: '1 Star' },
+        { key: 2, label: '2 Stars' },
+        { key: 3, label: '3 Stars' },
+        { key: 4, label: '4 Stars' },
+        { key: 5, label: '5 Stars' },
+    ];
+
+    const priceOptions = [
+        { key: 1, label: '$' },
+        { key: 2, label: '$$' },
+        { key: 3, label: '$$$' },
+    ];
+
+    useEffect(() => {
+        fetch(`${apiUrl}/api/restaurants`)
+            .then((response) => response.json())
+            .then((data) => setRestaurants(data))
+            .catch((error) => console.error('Error fetching restaurants: ', error));
+    }, []);
+
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.topContainer}>
@@ -19,16 +47,32 @@ const Restaurants = () => {
                 <View style={styles.rowContainer}>
                     <View style={styles.halfContainer}>
                         <Text style={styles.subText}>Rating</Text>
-                        <View style={styles.dropdownButton}>
-                            <Text style={styles.buttonText}>-- Select --</Text>
-                        </View>
+                        <ModalSelector
+                            data={ratingOptions}
+                            initValue="-- Select --"
+                            onChange={(option) => setRating(option.key)}
+                            style={styles.dropdownButton}
+                            selectTextStyle={styles.buttonText}
+                            cancelTextStyle={styles.buttonText}
+                            optionTextStyle={styles.buttonText}
+                            cancelStyle={styles.dropdownButton}
+                            optionStyle={styles.dropdownButton}
+                        />
                     </View>
 
                     <View style={styles.halfContainer}>
                         <Text style={styles.subText}>Price</Text>
-                        <View style={styles.dropdownButton}>
-                            <Text style={styles.buttonText}>-- Select --</Text>
-                        </View>
+                        <ModalSelector
+                            data={priceOptions}
+                            initValue="-- Select --"
+                            onChange={(option) => setPrice(option.key)}
+                            style={styles.dropdownButton}
+                            selectTextStyle={styles.buttonText}
+                            cancelTextStyle={styles.buttonText}
+                            optionTextStyle={styles.buttonText}
+                            cancelStyle={styles.dropdownButton}
+                            optionStyle={styles.dropdownButton}
+                        />
                     </View>
                 </View>
             </View>
@@ -36,40 +80,56 @@ const Restaurants = () => {
             <View style={styles.bottomContainer}>
                 <Text style={styles.headerText}>RESTAURANTS</Text>
             </View>
+
+            <ScrollView contentContainerStyle={styles.scrollableContainer}>
+            <View style={styles.halfContainer}>
+                {restaurants.slice(0, Math.ceil(restaurants.length / 2)).map(restaurant => (
+                    <RestaurantCard key={restaurant.id} restaurant={restaurant} />
+                ))}
+            </View>
+            <View style={styles.halfContainer}>
+                {restaurants.slice(Math.ceil(restaurants.length / 2)).map(restaurant => (
+                    <RestaurantCard key={restaurant.id} restaurant={restaurant} />
+                ))}
+            </View>
+        </ScrollView>
         </SafeAreaView>
     );
 };
-    
+
 const styles = StyleSheet.create({
-    bottomContainer: {
-        flex: 3,
+    container: {
+        flex: 1,
+        backgroundColor: '#FFFFFF',
+        margin: 10,
+    },
+    topContainer: {
         paddingHorizontal: 10,
+        paddingVertical: 20,
+        backgroundColor: '#FFFFFF',
+        paddingLeft: 20,
+    },
+    bottomContainer: {
+        paddingHorizontal: 10,
+        paddingVertical: 10,
         backgroundColor: '#FFF',
-        justifyContent: 'flex-start'
+        justifyContent: 'flex-start',
     },
     buttonText: {
         fontSize: 18,
         color: '#FFFFFF',
     },
-    container: {
-        flex: 1,
-        borderWidth: 1,
-        margin: 10,
-        backgroundColor: '#FFFFFF'
-    },
     dropdownButton: {
         height: 40,
         backgroundColor: '#DA583B',
-        alignItems: 'center',
         justifyContent: 'center',
-        borderRadius: 5,
+        borderRadius: 10,
+        overflow: 'hidden',
     },
     halfContainer: {
         flex: 1,
         justifyContent: 'flex-start',
-        paddingRight: 20, // Add padding between the two half containers
-        borderRadius: 1,
-        borderColor: 'red',
+        paddingRight: 20,
     },
     headerText: {
         padding: 5,
@@ -86,12 +146,26 @@ const styles = StyleSheet.create({
         fontSize: 20,
         fontFamily: 'Oswald',
     },
-    topContainer: {
-        flex: .80,
+    scrollableContainer: {
+        flex: 1,
         paddingHorizontal: 10,
-        justifyContent: 'flex-start',
+        paddingTop: 10,
+        borderWidth: 1,
+    },
+    scrollableContainer: {
+        flex: 1,
+        flexDirection: 'row',
+        paddingHorizontal: 10,
+        paddingTop: 10,
+    },
+    halfScrollableContainer: {
+        flex: 1, 
+        marginHorizontal: 5, 
+        backgroundColor: '#F5F5F5',
+    },
+    scrollableContent: {
+        flexGrow: 1,
     },
 });
-    
-    export default Restaurants;
-    
+
+export default Restaurants;
