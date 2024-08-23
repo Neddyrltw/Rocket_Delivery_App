@@ -30,23 +30,21 @@ export default function App() {
 
   return (
     <NavigationContainer>
-      <SafeAreaView style={styles.container}>
         <Stack.Navigator screenOptions={{ headerShown: false}}>
             <Stack.Screen name="Login" component={Login} />
             <Stack.Screen name="Main" component={MainScreen} />
         </Stack.Navigator>
-      </SafeAreaView>
     </NavigationContainer>
   );
 }
 
 const MainScreen = () => {
     return(
-        <View style={styles.mainContainer}>
+        <SafeAreaView style={styles.mainContainer}>
             <Header />
             <Restaurants />
             <Footer />
-        </View>
+        </SafeAreaView>
     );
 }
 

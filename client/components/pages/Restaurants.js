@@ -11,68 +11,87 @@ import {
 } from 'react-native';
 
 const Restaurants = () => {
-    const [restaurants, setRestaurants] = useState([]);
-
-    const apiUrl = Constants.expoConfig?.extra?.apiUrl; 
-
-    useEffect(() => {
-        fetch(`${apiUrl}/api/restaurants`)
-        .then(response => response.json())
-        .then(data => setRestaurants(data.restaurants))
-        .catch(error => console.error('Error fetching restaurants: ', error));
-    }, []);
-
-    const renderItem = ({ item }) => (
-        <View style={styles.restaurantContainer}>
-            <Image source={{ uri: item.imageUrl }} style={styles.restaurantImage} />
-            <Text style={styles.restaurantName}>{item.name}</Text>
-            <Text style={styles.restaurantAddress}>{item.address}</Text>
-        </View>
-    );
-
     return (
         <SafeAreaView style={styles.container}>
-          <FlatList
-            data={restaurants}
-            renderItem={renderItem}
-            keyExtractor={item => item.id.toString()}
-            contentContainerStyle={styles.list}
-          />
+            <View style={styles.topContainer}>
+                <Text style={styles.headerText}>NEARBY RESTAURANTS</Text>
+                
+                <View style={styles.rowContainer}>
+                    <View style={styles.halfContainer}>
+                        <Text style={styles.subText}>Rating</Text>
+                        <View style={styles.dropdownButton}>
+                            <Text style={styles.buttonText}>-- Select --</Text>
+                        </View>
+                    </View>
+
+                    <View style={styles.halfContainer}>
+                        <Text style={styles.subText}>Price</Text>
+                        <View style={styles.dropdownButton}>
+                            <Text style={styles.buttonText}>-- Select --</Text>
+                        </View>
+                    </View>
+                </View>
+            </View>
+
+            <View style={styles.bottomContainer}>
+                <Text style={styles.headerText}>RESTAURANTS</Text>
+            </View>
         </SafeAreaView>
-      );
-    };
+    );
+};
     
-    const styles = StyleSheet.create({
-      container: {
-        flex: 1,
+const styles = StyleSheet.create({
+    bottomContainer: {
+        flex: 3,
+        paddingHorizontal: 10,
         backgroundColor: '#FFF',
-        paddingHorizontal: 20,
-      },
-      list: {
-        paddingBottom: 20,
-      },
-      restaurantContainer: {
-        backgroundColor: '#EEE',
-        padding: 15,
-        borderRadius: 10,
-        marginBottom: 15,
-      },
-      restaurantImage: {
-        width: '100%',
-        height: 200,
-        borderRadius: 10,
-      },
-      restaurantName: {
+        justifyContent: 'flex-start'
+    },
+    buttonText: {
         fontSize: 18,
+        color: '#FFFFFF',
+    },
+    container: {
+        flex: 1,
+        borderWidth: 1,
+        margin: 10,
+        backgroundColor: '#FFFFFF'
+    },
+    dropdownButton: {
+        height: 40,
+        backgroundColor: '#DA583B',
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: 5,
+    },
+    halfContainer: {
+        flex: 1,
+        justifyContent: 'flex-start',
+        paddingRight: 20, // Add padding between the two half containers
+        borderRadius: 1,
+        borderColor: 'red',
+    },
+    headerText: {
+        padding: 5,
+        fontSize: 20,
         fontWeight: 'bold',
+        fontFamily: 'Oswald',
+    },
+    rowContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
         marginTop: 10,
-      },
-      restaurantAddress: {
-        fontSize: 14,
-        color: '#555',
-        marginTop: 5,
-      },
-    });
+    },
+    subText: {
+        fontSize: 20,
+        fontFamily: 'Oswald',
+    },
+    topContainer: {
+        flex: .80,
+        paddingHorizontal: 10,
+        justifyContent: 'flex-start',
+    },
+});
     
     export default Restaurants;
     

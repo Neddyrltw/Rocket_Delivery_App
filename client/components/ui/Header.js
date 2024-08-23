@@ -18,7 +18,7 @@ const Header = ({ onLogout }) => {
       <View style={styles.header}>
         <Image source={HeaderLogo} style={styles.logo} />
         <TouchableOpacity style={styles.button} onPress={onLogout}>
-          <Text style={styles.buttonText}>Logout</Text>
+          <Text style={styles.buttonText}>LOG OUT</Text>
         </TouchableOpacity>
       </View>
     );
@@ -27,13 +27,14 @@ const Header = ({ onLogout }) => {
   const styles = StyleSheet.create({
     button: {
       backgroundColor: '#DA583B',
-      padding: 10,
-      borderRadius: 5,
+      padding: 5,
+      borderRadius: 10,
     },
     buttonText: {
       color: '#FFFFFF',
       fontSize: 16,
       fontWeight: 'bold',
+      fontFamily: 'Oswald',
       marginHorizontal: 10, 
       marginVertical: 5
     },
