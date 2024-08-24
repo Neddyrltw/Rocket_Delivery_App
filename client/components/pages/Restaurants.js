@@ -77,22 +77,20 @@ const Restaurants = () => {
                 </View>
             </View>
 
-            <View style={styles.bottomContainer}>
-                <Text style={styles.headerText}>RESTAURANTS</Text>
-            </View>
-
             <ScrollView contentContainerStyle={styles.scrollableContainer}>
-            <View style={styles.halfContainer}>
-                {restaurants.slice(0, Math.ceil(restaurants.length / 2)).map(restaurant => (
-                    <RestaurantCard key={restaurant.id} restaurant={restaurant} />
-                ))}
-            </View>
-            <View style={styles.halfContainer}>
-                {restaurants.slice(Math.ceil(restaurants.length / 2)).map(restaurant => (
-                    <RestaurantCard key={restaurant.id} restaurant={restaurant} />
-                ))}
-            </View>
-        </ScrollView>
+                <View style={styles.cardContainer}>
+                    {restaurants.slice(0, Math.ceil(restaurants.length / 2)).map(restaurant => (
+                        <RestaurantCard key={restaurant.id} restaurant={restaurant} />
+                    ))}
+                </View>
+                <View style={styles.cardContainer}>
+                    {restaurants.slice(Math.ceil(restaurants.length / 2)).map(restaurant => (
+                        <RestaurantCard key={restaurant.id} restaurant={restaurant} />
+                    ))}
+                </View>
+            </ScrollView>
+            {/* Spacer at the bottom */}
+            <View style={styles.bottomSpacer} />
         </SafeAreaView>
     );
 };
@@ -105,7 +103,7 @@ const styles = StyleSheet.create({
     },
     topContainer: {
         paddingHorizontal: 10,
-        paddingVertical: 20,
+        paddingVertical: 10,
         backgroundColor: '#FFFFFF',
         paddingLeft: 20,
     },
@@ -153,10 +151,9 @@ const styles = StyleSheet.create({
         borderWidth: 1,
     },
     scrollableContainer: {
-        flex: 1,
+        flexGrow: 1,
         flexDirection: 'row',
         paddingHorizontal: 10,
-        paddingTop: 10,
     },
     halfScrollableContainer: {
         flex: 1, 
