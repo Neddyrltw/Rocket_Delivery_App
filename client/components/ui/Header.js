@@ -7,22 +7,32 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
+import { useAuth } from '../contexts/AuthContext';
+import { useNavigation } from '@react-navigation/native';
+
 import HeaderLogo from '../../assets/Images/HeaderLogo.png';
 
 const { height } = Dimensions.get('window');
 const HEADER_HEIGHT = height * .10;
 
-const Header = ({ onLogout }) => {
+const Header = () => {
+  const { logout } = useAuth();
+  const navigation = useNavigation();
 
-    return (
-      <View style={styles.header}>
-        <Image source={HeaderLogo} style={styles.logo} />
-        <TouchableOpacity style={styles.button} onPress={onLogout}>
-          <Text style={styles.buttonText}>LOG OUT</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  };
+  const handleLogout = async () => {
+    await logout();
+    navigation.navigate('Login');
+  }
+
+  return (
+    <View style={styles.header}>
+    <Image source={HeaderLogo} style={styles.logo} />
+    <TouchableOpacity style={styles.button} onPress={handleLogout}>
+      <Text style={styles.buttonText}>LOG OUT</Text>
+    </TouchableOpacity>
+  </View>
+  );
+};
 
   const styles = StyleSheet.create({
     button: {

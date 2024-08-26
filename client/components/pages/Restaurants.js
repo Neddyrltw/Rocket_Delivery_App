@@ -13,12 +13,14 @@ import RestaurantCard from '../ui/RestaurantCard';
 
 const Restaurants = () => {
     const [restaurants, setRestaurants] = useState([]);
+    const [filteredRestaurants, setFilteredRestaurants] = useState([]);
     const [rating, setRating] = useState(null);
     const [price, setPrice] = useState(null);
 
     const apiUrl = Constants.expoConfig?.extra?.apiUrl;
 
     const ratingOptions = [
+        { key: 'clear', label: 'Clear Selection' }, // Add clear option
         { key: 1, label: '1 Star' },
         { key: 2, label: '2 Stars' },
         { key: 3, label: '3 Stars' },
@@ -27,6 +29,7 @@ const Restaurants = () => {
     ];
 
     const priceOptions = [
+        { key: 'clear', label: 'Clear Selection' }, // Add clear option
         { key: 1, label: '$' },
         { key: 2, label: '$$' },
         { key: 3, label: '$$$' },
@@ -35,9 +38,46 @@ const Restaurants = () => {
     useEffect(() => {
         fetch(`${apiUrl}/api/restaurants`)
             .then((response) => response.json())
-            .then((data) => setRestaurants(data))
+            .then((data) => {
+                setRestaurants(data);
+                setFilteredRestaurants(data); // Initialize filtered data
+            })
             .catch((error) => console.error('Error fetching restaurants: ', error));
     }, []);
+
+    useEffect(() => {
+        filterRestaurants(); // Trigger filter when rating or price changes
+    }, [rating, price]);
+
+    const filterRestaurants = () => {
+        let filtered = restaurants;
+
+        if (rating !== null) {
+            filtered = filtered.filter(restaurant => restaurant.rating === rating);
+        }
+
+        if (price !== null) {
+            filtered = filtered.filter(restaurant => restaurant.price_range === price);
+        }
+
+        setFilteredRestaurants(filtered);
+    };
+
+    const handleRatingChange = (option) => {
+        if (option.key === 'clear') {
+            setRating(null); // Clear the selection
+        } else {
+            setRating(option.key);
+        }
+    };
+
+    const handlePriceChange = (option) => {
+        if (option.key === 'clear') {
+            setPrice(null); // Clear the selection
+        } else {
+            setPrice(option.key);
+        }
+    };
 
     return (
         <SafeAreaView style={styles.container}>
@@ -49,8 +89,8 @@ const Restaurants = () => {
                         <Text style={styles.subText}>Rating</Text>
                         <ModalSelector
                             data={ratingOptions}
-                            initValue="-- Select --"
-                            onChange={(option) => setRating(option.key)}
+                            initValue={rating ? `${rating} Stars` : '-- Select --'}
+                            onChange={handleRatingChange}
                             style={styles.dropdownButton}
                             selectTextStyle={styles.buttonText}
                             cancelTextStyle={styles.buttonText}
@@ -64,8 +104,8 @@ const Restaurants = () => {
                         <Text style={styles.subText}>Price</Text>
                         <ModalSelector
                             data={priceOptions}
-                            initValue="-- Select --"
-                            onChange={(option) => setPrice(option.key)}
+                            initValue={price ? `${'$'.repeat(price)}` : '-- Select --'}
+                            onChange={handlePriceChange}
                             style={styles.dropdownButton}
                             selectTextStyle={styles.buttonText}
                             cancelTextStyle={styles.buttonText}
@@ -77,20 +117,23 @@ const Restaurants = () => {
                 </View>
             </View>
 
+            <View style={styles.bottomContainer}>
+                <Text style={styles.headerText}>RESTAURANTS</Text>
+            </View>
+
             <ScrollView contentContainerStyle={styles.scrollableContainer}>
-                <View style={styles.cardContainer}>
-                    {restaurants.slice(0, Math.ceil(restaurants.length / 2)).map(restaurant => (
+                <View style={styles.halfContainer}>
+                    {filteredRestaurants.slice(0, Math.ceil(filteredRestaurants.length / 2)).map(restaurant => (
                         <RestaurantCard key={restaurant.id} restaurant={restaurant} />
                     ))}
                 </View>
-                <View style={styles.cardContainer}>
-                    {restaurants.slice(Math.ceil(restaurants.length / 2)).map(restaurant => (
+
+                <View style={styles.halfContainer}>
+                    {filteredRestaurants.slice(Math.ceil(filteredRestaurants.length / 2)).map(restaurant => (
                         <RestaurantCard key={restaurant.id} restaurant={restaurant} />
                     ))}
                 </View>
             </ScrollView>
-            {/* Spacer at the bottom */}
-            <View style={styles.bottomSpacer} />
         </SafeAreaView>
     );
 };
@@ -109,13 +152,21 @@ const styles = StyleSheet.create({
     },
     bottomContainer: {
         paddingHorizontal: 10,
-        paddingVertical: 10,
-        backgroundColor: '#FFF',
-        justifyContent: 'flex-start',
+        backgroundColor: '#FFFFFF',
     },
-    buttonText: {
-        fontSize: 18,
-        color: '#FFFFFF',
+    rowContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginTop: 10,
+    },
+    halfContainer: {
+        flex: 1,
+        justifyContent: 'flex-start',
+        paddingRight: 20,
+    },
+    subText: {
+        fontSize: 20,
+        fontFamily: 'Oswald',
     },
     dropdownButton: {
         height: 40,
@@ -124,10 +175,9 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         overflow: 'hidden',
     },
-    halfContainer: {
-        flex: 1,
-        justifyContent: 'flex-start',
-        paddingRight: 20,
+    buttonText: {
+        fontSize: 18,
+        color: '#FFFFFF',
     },
     headerText: {
         padding: 5,
@@ -135,33 +185,15 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         fontFamily: 'Oswald',
     },
-    rowContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginTop: 10,
-    },
-    subText: {
-        fontSize: 20,
-        fontFamily: 'Oswald',
-    },
     scrollableContainer: {
+        flexGrow: 1,
+        flexDirection: 'row',
+        paddingHorizontal: 10,
+    },
+    cardContainer: {
         flex: 1,
-        paddingHorizontal: 10,
-        paddingTop: 10,
-        borderWidth: 1,
-    },
-    scrollableContainer: {
-        flexGrow: 1,
-        flexDirection: 'row',
-        paddingHorizontal: 10,
-    },
-    halfScrollableContainer: {
-        flex: 1, 
-        marginHorizontal: 5, 
-        backgroundColor: '#F5F5F5',
-    },
-    scrollableContent: {
-        flexGrow: 1,
+        marginHorizontal: -3,
+        backgroundColor: '#FFFFFF',
     },
 });
 
