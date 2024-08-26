@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import Constants from 'expo-constants';
 import { useNavigation } from '@react-navigation/native';
 import {
   Alert,
@@ -11,6 +10,8 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import Constants from 'expo-constants';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import MyAppHeaderText from '../ui/MyAppHeaderText';
 import logo from '../../assets/logo.png';
@@ -40,8 +41,15 @@ const Login = () => {
   })
 
   .then(response => response.json())
-  .then(data => {
+  .then(async data => {
     if (data.success) {
+      const userData = {
+        user_id: data.user_id,
+        customer_id: data.customer_id,
+        courier_id: data.courier_id,
+      };
+
+      await AsyncStorage.setItem('user', JSON.stringify(userData));
       Alert.alert('Success', 'Logged in successfully!');
       setErrorMessage('');
       navigation.navigate('Main');

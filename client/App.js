@@ -3,6 +3,7 @@ import { ActivityIndicator, SafeAreaView, StyleSheet, View } from 'react-native'
 import * as Font from 'expo-font';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { AuthProvider } from './components/contexts/AuthContext';
 
 import Login from './components/pages/Login';
 import Restaurants from './components/pages/Restaurants';
@@ -29,12 +30,14 @@ export default function App() {
   }
 
   return (
-    <NavigationContainer>
-        <Stack.Navigator screenOptions={{ headerShown: false}}>
-            <Stack.Screen name="Login" component={Login} />
-            <Stack.Screen name="Main" component={MainScreen} />
-        </Stack.Navigator>
-    </NavigationContainer>
+    <AuthProvider>
+        <NavigationContainer>
+            <Stack.Navigator screenOptions={{ headerShown: false}}>
+                <Stack.Screen name="Login" component={Login} />
+                <Stack.Screen name="Main" component={MainScreen} />
+            </Stack.Navigator>
+        </NavigationContainer>
+    </AuthProvider>
   );
 }
 

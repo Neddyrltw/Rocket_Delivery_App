@@ -9,7 +9,9 @@ const { width } = Dimensions.get('window');
 const RestaurantCard = ({ restaurant }) => {
     return (
         <View style={styles.cardContainer}>
+          <View style={styles.imageContainer}>
             <Image source={getRestaurantImage(restaurant.id)} style={styles.image} />
+          </View>
             <View style={styles.infoContainer}>
                 <Text style={styles.name}>{restaurant.name}</Text>
                 <Text style={styles.price}>{'$'.repeat(restaurant.price_range)}</Text>
@@ -21,45 +23,52 @@ const RestaurantCard = ({ restaurant }) => {
 
 const styles = StyleSheet.create({
     cardContainer: {
-        width: width * 0.4, // Adjust width to 90% of screen width
-        height: width * 0.4 * 1.25, // Adjust height to be proportional to width, e.g., 1.5 times the width
+        width: width * 0.4, 
+        height: width * 0.4 * 1.25, 
         backgroundColor: '#FFF',
         borderRadius: 10,
         margin: 10,
-        overflow: 'hidden',
         borderWidth: 1,
-        borderColor: '#DDDDDD', // Light grey border
-        // Shadows for iOS
+        borderBottomWidth: 5,
+        borderColor: '#DDDDDD',
+        borderBottomColor: '#CCCCCC', 
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 4,
-        // Elevation for Android
         elevation: 3,
+    },
+    imageContainer: {
+        borderTopLeftRadius: 10,
+        borderTopRightRadius: 10,
+        overflow: 'hidden',
+        height: '60%', 
     },
     image: {
         width: '100%',
-        height: '60%', // Adjust image height to occupy 60% of the card's height
+        height: '100%',
     },
     infoContainer: {
         padding: 10,
         marginTop: 5,
         backgroundColor: '#FFF',
-        height: '40%', // Adjust info container to occupy 40% of the card's height
+        height: '40%', 
+        borderBottomLeftRadius: 10,
+        borderBottomRightRadius: 10,
     },
     name: {
-        fontSize: 16, // Increase font size for better readability in larger cards
+        fontSize: 16, 
         fontWeight: 'bold',
     },
     price: {
-        fontSize: 16, // Increase font size for better readability
+        fontSize: 16,
         color: '#777',
     },
     rating: {
-        fontSize: 16, // Increase font size for better readability
+        fontSize: 16,
         color: '#DA583B',
     },
-
 });
+
 
 export default RestaurantCard;
