@@ -1,14 +1,21 @@
 import React from 'react';
-import { SafeAreaView, Text, StyleSheet, View, TouchableOpacity } from 'react-native';
-
+import { SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import OrderCard
+ from '../ui/OrderCard';
 const OrderPage = () => {
+    const sampleItems = [
+        { name: 'Burger', price: '13.99', description: 'A delicious beef burger', image: 'https://via.placeholder.com/50' },
+        { name: 'Pizza', price: '$24.99', description: 'Cheesy pizza with pepperoni', image: 'https://via.placeholder.com/50' },
+        // Add more items here
+    ];
+
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.topContainer}>
                 <Text style={styles.headerText}>RESTAURANT MENU</Text>
                 <View style={styles.rowContainer}>
                     <View style={styles.leftContainer}>
-                        <Text style={styles.restaurantName}>Restaurant Name</Text>
+                        <Text style={styles.restaurantName}>Golden Shower</Text>
                         <Text style={styles.subText}>Price: {'$'.repeat(3)}</Text>
                         <Text style={styles.subText}>Rating: {'★'.repeat(4)}</Text>
                     </View>
@@ -17,6 +24,12 @@ const OrderPage = () => {
                     </TouchableOpacity>
                 </View>
             </View>
+
+            <ScrollView contentContainerStyle={styles.scrollableContainer}>
+                {sampleItems.map((item, index) => (
+                    <OrderCard key={index} item={item} />
+                ))}
+            </ScrollView>
         </SafeAreaView>
     );
 };
@@ -33,16 +46,10 @@ const styles = StyleSheet.create({
         backgroundColor: '#FFFFFF',
         paddingLeft: 20,
     },
-    headerText: {
-        padding: 5,
-        fontSize: 20,
-        fontWeight: 'bold',
-        fontFamily: 'Oswald',
-    },
     rowContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems: 'flext-start',
+        alignItems: 'center',
         marginTop: 10,
     },
     leftContainer: {
@@ -50,30 +57,30 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start',
     },
     rightContainer: {
-        width: '40%',
+        justifyContent: 'flex-end',
+        alignItems: 'center',
+        padding: 10,
         backgroundColor: '#DA583B',
         borderRadius: 5,
-        alignItems: 'center',
-        alignSelf: 'flex-start',
-    },
-    restaurantName: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        marginBottom: 5,
-    },
-    subText: {
-        fontSize: 14,
     },
     buttonText: {
         color: '#FFFFFF',
-        backgroundColor: '#DA583B',
         fontSize: 18,
-        fontFamily: 'Oswald',
-        padding: 5,
     },
-    button: {
-        width: '30%',
-        alignItems: 'center',
+    scrollableContainer: {
+        flexGrow: 1,
+        paddingHorizontal: 10,
+    },
+    headerText: {
+        fontSize: 20,
+        fontWeight: 'bold',
+    },
+    restaurantName: {
+        fontSize: 20,
+        fontWeight: 'bold',
+    },
+    subText: {
+        fontSize: 18,
     },
 });
 
