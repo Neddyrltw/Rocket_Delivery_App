@@ -3,43 +3,48 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faBurger, faClockRotateLeft } from '@fortawesome/free-solid-svg-icons';
 
-
 const Footer = () => {
     return (
         <View style={styles.footer}>
-            <View style={styles.iconContainer}>
+            <View style={styles.leftContainer}>
                 <TouchableOpacity style={styles.button}>
                     <FontAwesomeIcon icon={faBurger} size={30} color="#000" />
                 </TouchableOpacity>
                 <Text style={styles.subtitle}>Restaurants</Text>
             </View>
-            <View style={styles.iconContainer}>
+            <View style={styles.rightContainer}>
                 <TouchableOpacity style={styles.button}>
                     <FontAwesomeIcon icon={faClockRotateLeft} size={30} color="#000" />
                 </TouchableOpacity>
                 <Text style={styles.subtitle}>Order History</Text>
             </View>
         </View>
-    )
+    );
 };
 
 const styles = StyleSheet.create({
     footer: {
         width: '100%',
         flexDirection: 'row',
-        justifyContent: 'space-evenly',
+        justifyContent: 'space-between', // Ensure containers are on opposite sides
         alignItems: 'center',
-        paddingVertical: 10,
         backgroundColor: '#FFFFFF',
     },
-    iconContainer: {
-        alignItems: 'center', 
+    leftContainer: {
+        flexDirection: 'column', // Align icon and text vertically
+        alignItems: 'center',
+        marginLeft: 75, // Adjust this to move the left container as needed
+    },
+    rightContainer: {
+        flexDirection: 'column', // Align icon and text vertically
+        alignItems: 'center',
+        marginRight: 75, // Adjust this to move the right container as needed
     },
     button: {
         width: '25%',
         aspectRatio: 2,
-        backgroundColor: '#FFFFFF', 
-        borderRadius: 50, 
+        backgroundColor: '#FFFFFF',
+        borderRadius: 50,
         alignItems: 'center',
         justifyContent: 'center',
         marginBottom: 5,
@@ -51,7 +56,6 @@ const styles = StyleSheet.create({
         marginTop: 5,
         fontFamily: 'Oswald',
     },
-  });
-  
-  export default Footer;
-  
+});
+
+export default Footer;

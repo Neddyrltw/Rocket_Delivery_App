@@ -1,23 +1,29 @@
-// RestaurantCard.js
 import React from 'react';
-import { Dimensions, View, Text, Image, StyleSheet } from 'react-native';
+import { Dimensions, View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { getRestaurantImage } from './RestaurantImages';
+import { useNavigation } from '@react-navigation/native';
 
-// Get screen dimentions
+// Get screen dimensions
 const { width } = Dimensions.get('window');
 
 const RestaurantCard = ({ restaurant }) => {
+    const navigation = useNavigation();
+
+    const handlePress = () => {
+        navigation.navigate('OrderPage');
+    }
+
     return (
-        <View style={styles.cardContainer}>
-          <View style={styles.imageContainer}>
-            <Image source={getRestaurantImage(restaurant.id)} style={styles.image} />
-          </View>
+        <TouchableOpacity style={styles.cardContainer} onPress={handlePress}>
+            <View style={styles.imageContainer}>
+                <Image source={getRestaurantImage(restaurant.id)} style={styles.image} />
+            </View>
             <View style={styles.infoContainer}>
                 <Text style={styles.name}>{restaurant.name}</Text>
                 <Text style={styles.price}>{'$'.repeat(restaurant.price_range)}</Text>
                 <Text style={styles.rating}>{'★'.repeat(restaurant.rating)}</Text>
             </View>
-        </View>
+        </TouchableOpacity>
     );
 };
 
@@ -69,6 +75,5 @@ const styles = StyleSheet.create({
         color: '#DA583B',
     },
 });
-
 
 export default RestaurantCard;

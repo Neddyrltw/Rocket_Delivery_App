@@ -7,6 +7,7 @@ import { AuthProvider } from './components/contexts/AuthContext';
 
 import Login from './components/pages/Login';
 import Restaurants from './components/pages/Restaurants';
+import OrderPage from './components/pages/OrderPage';
 import Header from './components/ui/Header';
 import Footer from './components/ui/Footer';
 
@@ -35,6 +36,7 @@ export default function App() {
             <Stack.Navigator screenOptions={{ headerShown: false}}>
                 <Stack.Screen name="Login" component={Login} />
                 <Stack.Screen name="Main" component={MainScreen} />
+                <Stack.Screen name="OrderPage" component={OrderPageScreen} />
             </Stack.Navigator>
         </NavigationContainer>
     </AuthProvider>
@@ -46,6 +48,16 @@ const MainScreen = () => {
         <SafeAreaView style={styles.mainContainer}>
             <Header />
             <Restaurants />
+            <Footer />
+        </SafeAreaView>
+    );
+}
+
+const OrderPageScreen = () => {
+    return (
+        <SafeAreaView style={styles.mainContainer}>
+            <Header />
+            <OrderPage />
             <Footer />
         </SafeAreaView>
     );
