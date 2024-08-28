@@ -12,7 +12,6 @@ import {
 } from 'react-native';
 import Constants from 'expo-constants';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
 import MyAppHeaderText from '../ui/MyAppHeaderText';
 import logo from '../../assets/logo.png';
 
@@ -50,6 +49,7 @@ const Login = () => {
       };
 
       await AsyncStorage.setItem('user', JSON.stringify(userData));
+      console.log('User logged in:', userData);
       Alert.alert('Success', 'Logged in successfully!');
       setErrorMessage('');
       navigation.navigate('Main');

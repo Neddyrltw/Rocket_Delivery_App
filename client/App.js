@@ -1,5 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { ActivityIndicator, SafeAreaView, StyleSheet, View } from 'react-native';
+import {
+    ActivityIndicator,
+    SafeAreaView,
+    StyleSheet,
+    View
+} from 'react-native';
 import * as Font from 'expo-font';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -8,6 +13,7 @@ import { AuthProvider } from './components/contexts/AuthContext';
 import Login from './components/pages/Login';
 import Restaurants from './components/pages/Restaurants';
 import OrderPage from './components/pages/OrderPage';
+import OrderHistory from './components/pages/OrderHistory';
 import Header from './components/ui/Header';
 import Footer from './components/ui/Footer';
 
@@ -37,30 +43,41 @@ export default function App() {
                 <Stack.Screen name="Login" component={Login} />
                 <Stack.Screen name="Main" component={MainScreen} />
                 <Stack.Screen name="OrderPage" component={OrderPageScreen} />
+                <Stack.Screen name="OrderHistory" component={OrderHistoryScreen} />
             </Stack.Navigator>
         </NavigationContainer>
     </AuthProvider>
   );
 }
 
-const MainScreen = () => {
+const MainScreen = ({ navigation }) => {
     return(
         <SafeAreaView style={styles.mainContainer}>
             <Header />
             <Restaurants />
-            <Footer />
+            <Footer navigation={navigation}/>
         </SafeAreaView>
     );
 }
 
-const OrderPageScreen = () => {
+const OrderPageScreen = ({ navigation, route }) => {
     return (
         <SafeAreaView style={styles.mainContainer}>
             <Header />
-            <OrderPage />
-            <Footer />
+            <OrderPage route={route} />
+            <Footer navigation={navigation}/>
         </SafeAreaView>
     );
+}
+
+const OrderHistoryScreen = ( {navigation }) => {
+  return (
+      <SafeAreaView style={styles.mainContainer}>
+          <Header />
+          <OrderHistory />
+          <Footer navigation={navigation}/>
+      </SafeAreaView>
+  );
 }
 
 const styles = StyleSheet.create({

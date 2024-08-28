@@ -1,26 +1,24 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import RestaurantMenu from '../../assets/Images/RestaurantMenu.jpg';
 
-const OrderCard = ({ item }) => {
-    const [quantity, setQuantity] = useState(0);
-
-    const increment = () => {
-        setQuantity(quantity + 1);
-    };
-
-    const decrement = () => {
-        setQuantity(quantity - 1 );
+const OrderCard = ({ item, quantity, increment, decrement }) => {
+    const formatCurrency = (amountInCents) => {
+        const amountInDollars = amountInCents / 100;
+        return new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+        }).format(amountInDollars);
     };
 
     return (
         <View style={styles.cardContainer}>
             <View style={styles.leftContainer}>
-                {/* Placeholder for Image */}
-                <Image source={{ uri: item.image }} style={styles.image} />
+                <Image source={RestaurantMenu} style={styles.image} />
             </View>
             <View style={styles.centerContainer}>
                 <Text style={styles.itemName}>{item.name}</Text>
-                <Text style={styles.itemPrice}>{item.price}</Text>
+                <Text style={styles.itemPrice}>{formatCurrency(item.cost)}</Text>
                 <Text style={styles.itemDescription}>{item.description}</Text>
             </View>
             <View style={styles.rightContainer}>
@@ -63,7 +61,7 @@ const styles = StyleSheet.create({
         fontFamily: 'Oswald',
     },
     itemPrice: {
-        fontsize: 16,
+        fontSize: 15,
         fontWeight: 'bold',
     },
     itemDescription: {
@@ -71,6 +69,7 @@ const styles = StyleSheet.create({
         color: '#666',
     },
     iconText: {
+        fontSize: 18,
         color: '#fff',
     },
     rightContainer: {
@@ -81,9 +80,9 @@ const styles = StyleSheet.create({
         paddingRight: 15,
     },
     iconContainer: {
-        backgroundColor:'#222126',
-        borderRadius: 30,
-        width: '23%',
+        backgroundColor: '#222126',
+        borderRadius: 40,
+        width: '30%',
         height: '30%',
         justifyContent: 'center',
         alignItems: 'center',

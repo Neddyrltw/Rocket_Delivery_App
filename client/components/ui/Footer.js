@@ -3,17 +3,23 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faBurger, faClockRotateLeft } from '@fortawesome/free-solid-svg-icons';
 
-const Footer = () => {
+const Footer = ({ navigation }) => {
     return (
         <View style={styles.footer}>
             <View style={styles.leftContainer}>
-                <TouchableOpacity style={styles.button}>
+                <TouchableOpacity
+                    style={styles.button}
+                    onPress={() => navigation.navigate('Main')}    
+                >
                     <FontAwesomeIcon icon={faBurger} size={30} color="#000" />
                 </TouchableOpacity>
                 <Text style={styles.subtitle}>Restaurants</Text>
             </View>
             <View style={styles.rightContainer}>
-                <TouchableOpacity style={styles.button}>
+                <TouchableOpacity
+                    style={styles.button}
+                    onPress={() => navigation.navigate('OrderHistory')}
+                >
                     <FontAwesomeIcon icon={faClockRotateLeft} size={30} color="#000" />
                 </TouchableOpacity>
                 <Text style={styles.subtitle}>Order History</Text>

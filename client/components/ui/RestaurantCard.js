@@ -10,7 +10,7 @@ const RestaurantCard = ({ restaurant }) => {
     const navigation = useNavigation();
 
     const handlePress = () => {
-        navigation.navigate('OrderPage');
+        navigation.navigate('OrderPage', { restaurant });
     }
 
     return (
