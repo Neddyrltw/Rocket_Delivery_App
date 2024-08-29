@@ -1,30 +1,41 @@
 import React, { useState, useEffect } from 'react';
-import { SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View, FlatList } from 'react-native';
+import { SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Constants from 'expo-constants';
 import OrderCard from '../ui/OrderCard';
+import OrderConfirmation from '../modals/OrderConfirmation';
 
 const OrderPage = ({ route }) => {
-    const { restaurant } = route.params || {}; 
+    const { restaurant } = route.params || {}; // get restaurant object
+    const restaurantId = restaurant ? restaurant.id : null
     const [menuItems, setMenuItems] = useState([]);
     const [quantities, setQuantities] = useState({});
-
+    const [modalVisibility, setModalVisibility] = useState(false);
+    const [customerId, setCustomerId] = useState(null);
     const apiUrl = Constants.expoConfig?.extra?.apiUrl; 
 
     useEffect(() => {
-        
-        const fetchMenuItems = async () => {
+        const fetchData = async () => {
             try {
+                // Fetch customer id
+                const userData = await AsyncStorage.getItem('user');
+                if (userData) {
+                    const { customer_id } = JSON.parse(userData);
+                    setCustomerId(customer_id);
+                }
+    
+                // Fetch menu items
                 const response = await fetch(`${apiUrl}/api/products?restaurant=${restaurant.id}`);
                 const data = await response.json();
                 setMenuItems(data);
                 setQuantities(data.reduce((acc, item) => ({ ...acc, [item.id]: 0}), {})); // initialize quantities
-            } catch (err) {
-                console.error('Error fetching menu items: ', err);
+            } catch (error) {
+                console.error('Error fetching data: ', error);
             }
         };
-
-        fetchMenuItems();
-    }, [restaurant]);
+    
+        fetchData();
+    }, [restaurant, apiUrl]);
 
     const increment = (itemId) => {
         setQuantities(prevQuantities => ({
@@ -42,6 +53,16 @@ const OrderPage = ({ route }) => {
 
     const totalQuantity = Object.values(quantities).reduce((sum, quantity) => sum + quantity, 0);
 
+    const handleCreateOrder = () => {
+        if (totalQuantity > 0 && customerId && restaurantId) {
+            setModalVisibility(true);
+        }
+    };
+
+    const handleCloseModal = () => {
+        setModalVisibility(false);
+    }
+
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.topContainer}>
@@ -57,6 +78,7 @@ const OrderPage = ({ route }) => {
                         styles.rightContainer,
                         totalQuantity > 0 ? styles.activeButton : styles.inactiveButton
                     ]}
+                    onPress={handleCreateOrder}
                     disabled={totalQuantity === 0}
                     >
                         <Text style={styles.buttonText}>Create Order</Text>
@@ -75,6 +97,16 @@ const OrderPage = ({ route }) => {
                     />
                 ))}
             </ScrollView>
+
+            <OrderConfirmation
+                visible={modalVisibility}
+                onClose={handleCloseModal}
+                menuItems={menuItems}
+                quantities={quantities}
+                restaurantId={restaurantId}
+                customerId={customerId}
+            />
+
         </SafeAreaView>
     );
 };
