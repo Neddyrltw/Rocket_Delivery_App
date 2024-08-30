@@ -12,6 +12,7 @@ import Constants from 'expo-constants';
 const OrderConfirmation = ({ visible, onClose, menuItems, quantities, restaurantId, customerId }) => {
 
     const [isProcessing, setIsProcessing] = useState(false);
+    const [orderStatus, setOrderStatus] = useState(null);
     const apiUrl = Constants.expoConfig?.extra?.apiUrl;
 
     // Calculate toal cost
@@ -47,6 +48,9 @@ const OrderConfirmation = ({ visible, onClose, menuItems, quantities, restaurant
 
         try {
 
+            // Force failure for testing
+            throw new Error('Forced error for testing');
+
             const orderPayload = {  
                 restaurant_id: restaurantId,
                 customer_id: customerId,
@@ -67,22 +71,24 @@ const OrderConfirmation = ({ visible, onClose, menuItems, quantities, restaurant
                 body: JSON.stringify(orderPayload),
             });
 
-            console.log('response: ', response);
-            console.log('payload: ', orderPayload);
-
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
 
-            alert('Thank you!\nYour order has been received.');
-            onClose();
+            setOrderStatus('success');
 
         } catch (error) {
             console.error('Error creating order', error);
-            alert('Your order was not processed successfully\nPlease try again.');
+            setOrderStatus('failure');
         } finally {
             setIsProcessing(false);
         }
+    };
+
+    // Reset state when done
+    const handleClose = () => {
+        setOrderStatus(null);
+        onClose();
     };
 
     return (
@@ -90,13 +96,13 @@ const OrderConfirmation = ({ visible, onClose, menuItems, quantities, restaurant
             animationType="slide"
             transparent={true}
             visible={visible}
-            onRequestClose={onClose}
+            onRequestClose={handleClose}
         >
             <View style={styles.modalContainer}>
                 <View style={styles.modalContent}>
                     <View style={styles.titleContainer}>
                         <Text style={styles.modalTitle}>ORDER CONFIRMATION</Text>
-                        <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+                        <TouchableOpacity style={styles.closeButton} onPress={handleClose}>
                             <Text style={styles.closeButtonIcon}>X</Text>
                         </TouchableOpacity>
                     </View>
@@ -122,14 +128,32 @@ const OrderConfirmation = ({ visible, onClose, menuItems, quantities, restaurant
                         />
                     </View>
                     <View style={styles.buttonContainer}>
-                        <TouchableOpacity
-                            style={styles.orderConfirmation}
-                            onPress={handleCreateOrder}
-                            disabled={isProcessing}
-                        >
-                            <Text style={styles.orderConfirmationText}>
-                                {isProcessing ? 'PROCESSING ORDER' : 'CONFIRM ORDER'}</Text>
-                        </TouchableOpacity>
+                        {orderStatus === 'success' ? (
+                            <View style={styles.successMessageContainer}>
+                               <View style={styles.successIconContainer}>
+                                    <Text style={styles.successIcon}>✓</Text>
+                                </View>
+                                <Text style={styles.successText}>Thank you!</Text>
+                                <Text style={styles.successSubText}>Your order has been received</Text>
+                            </View>
+                        ) : orderStatus === 'failure' ? (
+                            <View style={styles.failureMessageContainer}>
+                                <View style={styles.failureIconContainer}>
+                                    <Text style={styles.failureIcon}>✗</Text>
+                                </View>
+                                <Text style={styles.failureText}>Your order was not processed correctly.</Text>
+                                <Text style={styles.failureSubText}>Please try again.</Text>
+                            </View>
+                        ) : (
+                            <TouchableOpacity
+                                style={styles.orderConfirmation}
+                                onPress={handleCreateOrder}
+                                disabled={isProcessing}
+                            >
+                                <Text style={styles.orderConfirmationText}>
+                                    {isProcessing ? 'PROCESSING ORDER' : 'CONFIRM ORDER'}</Text>
+                            </TouchableOpacity>
+                      )}
                     </View>
                 </View>
             </View>
@@ -242,6 +266,60 @@ const styles = StyleSheet.create({
     },
     orderConfirmationText: {
         color: '#FFF',
+        fontSize: 16,
+        textAlign: 'center',
+    },
+    successMessageContainer: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingHorizontal: 30,
+    },
+    successIconContainer: { 
+        backgroundColor: '#28a745',
+        width: '10%',          // Relative size of the circle
+        aspectRatio: 1,        // Keep the width and height equal
+        borderRadius: 100,     // Large borderRadius to make it circular
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    successIcon: {
+        fontSize: 20,
+        color: 'white',
+        textAlign: 'center',
+        textAlignVertical: 'center',
+    },
+    successText: {
+        fontSize: 20,
+        textAlign: 'center',
+        marginTop: 10,
+    },
+    successSubText: {
+        fontSize: 16,
+        textAlign: 'center',
+    },
+    failureMessageContainer: {
+        alignItems: 'center',
+    },
+    failureIconContainer: {
+        backgroundColor: '#D32F2F',
+        width: '10%',
+        aspectRatio: 1,
+        borderRadius: 100,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    failureIcon: {
+        fontSize: 20,
+        color: 'white',
+        textAlign: 'center',
+        textAlignVertical: 'center',
+    },
+    failureText: {
+        fontSize: 18,
+        textAlign: 'center',
+        marginTop: 5,
+    },
+    failureSubText: {
         fontSize: 16,
         textAlign: 'center',
     },

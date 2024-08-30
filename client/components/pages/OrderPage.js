@@ -60,6 +60,7 @@ const OrderPage = ({ route }) => {
     };
 
     const handleCloseModal = () => {
+        setQuantities(menuItems.reduce((acc, item) => ({ ...acc, [item.id]: 0}), {}));
         setModalVisibility(false);
     }
 
