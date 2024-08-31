@@ -5,5 +5,5 @@ class Product < ApplicationRecord
   validates :restaurant_id, :name, presence: true
   validates :cost, presence: true, numericality: { greater_than_or_equal_to: 0 }
 
-  scope :select_short, -> { select(:id, :name, :cost) }
+  scope :select_short, -> { select(:id, :name, :cost, :description) }
 end
