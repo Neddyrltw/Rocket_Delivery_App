@@ -41,9 +41,13 @@ const OrderHistory = () => {
               throw new Error(`Failed to fetch orders, status: ${response.status}`);
             }
 
+            // Receive db response
             const data = await response.json();
-            console.log('Fetched orders:', data);
+
+            // Sort orders by date descending
+            const sortedOrders = data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
             setOrders(data);
+
           } else {
             throw new Error('Customer ID not found in user data');
           }

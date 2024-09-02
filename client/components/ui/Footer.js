@@ -9,7 +9,7 @@ const Footer = ({ navigation }) => {
             <View style={styles.leftContainer}>
                 <TouchableOpacity
                     style={styles.button}
-                    onPress={() => navigation.navigate('Main')}    
+                    onPress={() => navigation.navigate('MainCustomerScreen')}    
                 >
                     <FontAwesomeIcon icon={faBurger} size={30} color="#000" />
                 </TouchableOpacity>
