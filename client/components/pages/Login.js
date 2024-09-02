@@ -11,10 +11,9 @@ import {
   View,
 } from 'react-native';
 import Constants from 'expo-constants';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import MyAppHeaderText from '../ui/MyAppHeaderText';
 import logo from '../../assets/logo.png';
-
+import { useAuth } from '../contexts/AuthContext';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -23,52 +22,60 @@ const Login = () => {
 
   const navigation = useNavigation();
   const apiUrl = Constants.expoConfig?.extra?.apiUrl;
+  const { login } = useAuth();  // Access login from AuthContext
 
-
-  const handleLoginPress = () => {
+  const handleLoginPress = async () => {
     if (!email || !password) {
-      showError('Please enter valid email and password.')
+      showError('Please enter valid email and password.');
       return;
     }
 
-  fetch(`${apiUrl}/api/login`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ email, password }),
-  })
+    try {
+      const response = await fetch(`${apiUrl}/api/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
 
-  .then(response => response.json())
-  .then(async data => {
-    if (data.success) {
-      const userData = {
-        user_id: data.user_id,
-        customer_id: data.customer_id,
-        courier_id: data.courier_id,
-      };
+      const data = await response.json();
 
-      await AsyncStorage.setItem('user', JSON.stringify(userData));
-      console.log('User logged in:', userData);
-      Alert.alert('Success', 'Logged in successfully!');
-      setErrorMessage('');
-      navigation.navigate('Main');
-    } else {
-      showError('Invalid email or password.')
+      if (data.success) {
+        const user = {
+          user_id: data.user_id,
+          customer_id: data.customer_id,
+          courier_id: data.courier_id,
+        };
+
+        await login(user);  // Use login from AuthContext
+        console.log('User logged in:', user);
+        Alert.alert('Success', 'Logged in successfully!');
+        setErrorMessage('');
+        
+        // Navigate based on user role
+        if (data.customer_id && data.courier_id) {
+          navigation.navigate('SelectAccountType'); // navigate to SelectAccountType if customer_id and courier_id are present
+        } else if (data.customer_id) {
+          navigation.navigate('MainCustomerPage'); // navigate to MainCustomerPage if customer_id is present
+        } else if (data.courier_id) { 
+          navigation.navigate('MainCourierPage'); //navigate to MainCourierPage if courier_id is present 
+        }
+      } else {
+        showError('Invalid email or password.');
+      }
+    } catch (error) {
+      console.error('Error during login: ', error);
+      showError('Something went wrong. Please try again.');
     }
-  })
-  .catch (error => {
-    console.error('Error during login: ', error)
-    showError('Something went wrong. Please try again.')
-  });
-};
+  };
 
-const showError = (message) => {
-  setErrorMessage(message);
-  setTimeout(() => {
-    setErrorMessage('');
-  }, 1000);
-};
+  const showError = (message) => {
+    setErrorMessage(message);
+    setTimeout(() => {
+      setErrorMessage('');
+    }, 3000);
+  };
   
   return (
     <SafeAreaView style={styles.wrapper}>
@@ -98,7 +105,7 @@ const showError = (message) => {
               style={styles.input}
               onChangeText={setPassword}
               value={password}
-              placeholder='●●●●●●●●'
+              placeholder='Enter your password here'
               secureTextEntry
             />
           </View>

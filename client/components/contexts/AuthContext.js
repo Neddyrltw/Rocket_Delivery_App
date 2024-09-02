@@ -8,26 +8,52 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const loadUser = async () => {
-      const storedUser = await AsyncStorage.getItem('user');
-      if (storedUser) {
-        setUser(JSON.parse(storedUser));
+
+      try { 
+        const storedUser = await AsyncStorage.getItem('userData');
+        if (storedUser) {
+          setUser(JSON.parse(storedUser));
+        }
+      } catch (error) {
+        console.error('Failed to load user data:', error);
       }
     };
+
     loadUser();
+
   }, []);
 
   const login = async (userData) => {
-    setUser(userData);
-    await AsyncStorage.setItem('user', JSON.stringify(userData));
+    try {
+      setUser(userData);
+      await AsyncStorage.setItem('userData', JSON.stringify(userData));
+    } catch (error) {
+      console.error('Failed to save user data:', error);
+    }
   };
   
   const logout = async () => {
-    setUser(null);
-    await AsyncStorage.removeItem('user');
+    try {
+      setUser(null);
+      await AsyncStorage.removeItem('userData');
+    } catch (error) {
+      console.error('Failed to remove user data:', error);
+    }
+  };
+
+  // Update account type
+  const setAccountType = async (type) => {
+    try {
+      const updatedUser = { ...user, accountType: type};
+      setUser(updatedUser);
+      await AsyncStorage .setItem('userData', JSON.stringify(updatedUser));
+    } catch (err) {
+      console.error('Failed to set account type: ', err);
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, setAccountType }}>
       {children}
     </AuthContext.Provider>
   );

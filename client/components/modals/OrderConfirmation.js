@@ -49,7 +49,7 @@ const OrderConfirmation = ({ visible, onClose, menuItems, quantities, restaurant
         try {
 
             // Force failure for testing
-            throw new Error('Forced error for testing');
+            // throw new Error('Forced error for testing');
 
             const orderPayload = {  
                 restaurant_id: restaurantId,

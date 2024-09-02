@@ -14,8 +14,10 @@ import Login from './components/pages/Login';
 import Restaurants from './components/pages/Restaurants';
 import OrderPage from './components/pages/OrderPage';
 import OrderHistory from './components/pages/OrderHistory';
+import CourierPage from './components/pages/CourierPage';
 import Header from './components/ui/Header';
 import Footer from './components/ui/Footer';
+import SelectAccountType from './components/pages/SelectAccountType';
 
 const Stack = createNativeStackNavigator();
 
@@ -41,16 +43,18 @@ export default function App() {
         <NavigationContainer>
             <Stack.Navigator screenOptions={{ headerShown: false}}>
                 <Stack.Screen name="Login" component={Login} />
-                <Stack.Screen name="Main" component={MainScreen} />
+                <Stack.Screen name="MainCustomerScreen" component={MainCustomerScreen} />
                 <Stack.Screen name="OrderPage" component={OrderPageScreen} />
                 <Stack.Screen name="OrderHistory" component={OrderHistoryScreen} />
+                <Stack.Screen name="SelectAccountType" component={SelectAccountType} />
+                <Stack.Screen name="MainCourierScreen" component={CourierPage} />
             </Stack.Navigator>
         </NavigationContainer>
     </AuthProvider>
   );
 }
 
-const MainScreen = ({ navigation }) => {
+const MainCustomerScreen = ({ navigation }) => {
     return(
         <SafeAreaView style={styles.mainContainer}>
             <Header />
@@ -77,6 +81,16 @@ const OrderHistoryScreen = ( {navigation }) => {
           <OrderHistory />
           <Footer navigation={navigation}/>
       </SafeAreaView>
+  );
+}
+
+const MainCourierScreen = ({ navigation }) => {
+  return (
+    <SafeAreaView style={styles.mainContainer}>
+      <Header />
+      <OrderHistory />
+      <Footer navigation={navigation} />
+    </SafeAreaView>
   );
 }
 
