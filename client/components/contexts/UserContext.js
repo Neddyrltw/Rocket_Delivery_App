@@ -12,24 +12,26 @@ const useUserData = () => {
 
     useEffect(() => {
         const fetchUserData = async () => {
-            console.log('Fetching user data');
             try {
+                
+                // Pull user data from AsyncStorage
                 const userString = await AsyncStorage.getItem('userData');
                 if (userString) {
+                    // Parse user data for id and type
                     const { user_id, accountType } = JSON.parse(userString);
 
+                    // Format type to lowercase
                     const formattedAccountType = accountType.toLowerCase();
-                    console.log('Account type: ', formattedAccountType);
 
+                    // Perform API call with id and formatted type
                     const response = await fetch(`${apiUrl}/api/account/${user_id}?type=${formattedAccountType}`);
-                    console.log('Response: ', response);
 
                     if (!response.ok) {
                         throw new Error('Network response was not ok');
                     }
 
                     const data = await response.json();
-                   console.log('data: ', data);
+                    console.log('User Data: ', data);
 
                     setUserData(data);
                 }

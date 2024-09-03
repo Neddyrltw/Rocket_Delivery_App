@@ -5,14 +5,19 @@ import {
     Text,
     StyleSheet,
     TouchableOpacity,
-    FlatList
+    FlatList,
 } from 'react-native';
+import Checkbox from 'expo-checkbox';
 import Constants from 'expo-constants';
 
 const OrderConfirmation = ({ visible, onClose, menuItems, quantities, restaurantId, customerId }) => {
 
     const [isProcessing, setIsProcessing] = useState(false);
+    const [hasProcessed, setHasProcessed] = useState(false);
     const [orderStatus, setOrderStatus] = useState(null);
+    const [sendEmail, setSendEmail] = useState(false);
+    const [sendText, setSendText] = useState(false);
+
     const apiUrl = Constants.expoConfig?.extra?.apiUrl;
 
     // Calculate toal cost
@@ -39,10 +44,12 @@ const OrderConfirmation = ({ visible, onClose, menuItems, quantities, restaurant
     const handleCreateOrder = async () => {
 
         setIsProcessing(true);
+        setHasProcessed(true);
 
         if (!apiUrl) {
             console.error('API URL is not defined.');
             setIsProcessing(false);
+            setHasProcessed(false);
             return;
         }
 
@@ -88,6 +95,7 @@ const OrderConfirmation = ({ visible, onClose, menuItems, quantities, restaurant
     // Reset state when done
     const handleClose = () => {
         setOrderStatus(null);
+        setHasProcessed(false);
         onClose();
     };
 
@@ -128,32 +136,58 @@ const OrderConfirmation = ({ visible, onClose, menuItems, quantities, restaurant
                         />
                     </View>
                     <View style={styles.buttonContainer}>
-                        {orderStatus === 'success' ? (
-                            <View style={styles.successMessageContainer}>
-                               <View style={styles.successIconContainer}>
-                                    <Text style={styles.successIcon}>✓</Text>
+                        {!isProcessing && !hasProcessed && (
+                            <>
+                                <Text style={styles.checkboxQuestion}>
+                                    Would you like to receive your order confirmation by email and/or text?
+                                </Text>
+                                    <View style={styles.checkboxContainer}>
+                                        <View style={styles.checkboxItem}>
+                                            <Checkbox
+                                                value={sendEmail}
+                                                onValueChange={setSendEmail}
+                                                color={'#609475'}
+                                            />
+                                            <Text style={styles.checkboxLabel}>By Email</Text>
+                                        </View>
+                                        <View style={styles.checkboxItem}>
+                                            <Checkbox
+                                                value={sendText}
+                                                onValueChange={setSendText}
+                                                color={'#609475'}
+                                            />
+                                            <Text style={styles.checkboxLabel}>By Phone</Text>
+                                        </View>
+                                    </View>
+                            </>
+                        )}
+                            
+                            {orderStatus === 'success' ? (
+                                <View style={styles.successMessageContainer}>
+                                <View style={styles.successIconContainer}>
+                                        <Text style={styles.successIcon}>✓</Text>
+                                    </View>
+                                    <Text style={styles.successText}>Thank you!</Text>
+                                    <Text style={styles.successSubText}>Your order has been received</Text>
                                 </View>
-                                <Text style={styles.successText}>Thank you!</Text>
-                                <Text style={styles.successSubText}>Your order has been received</Text>
-                            </View>
-                        ) : orderStatus === 'failure' ? (
-                            <View style={styles.failureMessageContainer}>
-                                <View style={styles.failureIconContainer}>
-                                    <Text style={styles.failureIcon}>✗</Text>
+                            ) : orderStatus === 'failure' ? (
+                                <View style={styles.failureMessageContainer}>
+                                    <View style={styles.failureIconContainer}>
+                                        <Text style={styles.failureIcon}>✗</Text>
+                                    </View>
+                                    <Text style={styles.failureText}>Your order was not processed correctly.</Text>
+                                    <Text style={styles.failureSubText}>Please try again.</Text>
                                 </View>
-                                <Text style={styles.failureText}>Your order was not processed correctly.</Text>
-                                <Text style={styles.failureSubText}>Please try again.</Text>
-                            </View>
-                        ) : (
-                            <TouchableOpacity
-                                style={styles.orderConfirmation}
-                                onPress={handleCreateOrder}
-                                disabled={isProcessing}
-                            >
-                                <Text style={styles.orderConfirmationText}>
-                                    {isProcessing ? 'PROCESSING ORDER' : 'CONFIRM ORDER'}</Text>
-                            </TouchableOpacity>
-                      )}
+                            ) : (
+                                <TouchableOpacity
+                                    style={styles.orderConfirmation}
+                                    onPress={handleCreateOrder}
+                                    disabled={isProcessing}
+                                >
+                                    <Text style={styles.orderConfirmationText}>
+                                        {isProcessing ? 'PROCESSING ORDER' : 'CONFIRM ORDER'}</Text>
+                                </TouchableOpacity>
+                        )}
                     </View>
                 </View>
             </View>
@@ -258,6 +292,25 @@ const styles = StyleSheet.create({
         borderTopWidth: 1,
         borderColor: '#ddd',
     },
+    checkboxQuestion: {
+        fontSize: 16,
+        marginBottom: 10,
+        textAlign: 'center',
+    },
+    checkboxContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        marginVertical: 10,
+        paddingBottom: 10,
+    },
+    checkboxItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    checkboxLabel: {
+        fontSize: 16,
+        marginLeft: 5,
+    },
     orderConfirmation: {
         backgroundColor: '#DA583B',
         padding: 10,
@@ -275,7 +328,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 30,
     },
     successIconContainer: { 
-        backgroundColor: '#28a745',
+        backgroundColor: '#609475',
         width: '10%',          // Relative size of the circle
         aspectRatio: 1,        // Keep the width and height equal
         borderRadius: 100,     // Large borderRadius to make it circular
@@ -301,7 +354,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     failureIconContainer: {
-        backgroundColor: '#D32F2F',
+        backgroundColor: '#851919',
         width: '10%',
         aspectRatio: 1,
         borderRadius: 100,
