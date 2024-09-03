@@ -5,8 +5,10 @@ import {
     TouchableOpacity,
     StyleSheet,
     Image,
-    Dimensions
+    Dimensions,
+    Alert
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faUserLarge, faTaxi } from '@fortawesome/free-solid-svg-icons';
@@ -22,9 +24,17 @@ const SelectAccountType = () => {
     const navigation = useNavigation();
 
 
-const handleSelectAccountType = (type) => {
-    setAccountType(type);
-    navigation.navigate(type === 'Customer' ? 'MainCustomerScreen' : 'MainCourierScreen');
+const handleSelectAccountType = async (type) => {
+    try {
+        await setAccountType(type);
+        await AsyncStorage.setItem('accountType', type);
+        navigation.navigate(type === 'Customer' ? 'MainCustomerScreen' : 'MainCourierScreen');
+    } catch (err) {
+        console.error('Error setting account type: ', err);
+        setErrorMessage('Failed to set account type. Please try again.');
+        Alert.alert('Error', 'Failed to set account type. Please try again.');
+    }
+
 }
 
 // Calculate icon size dynamically
@@ -79,12 +89,6 @@ const styles = StyleSheet.create({
     logo: {
         width: '80%',
         resizeMode: 'contain',
-    },
-    centerContainer: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-      paddingHorizontal: 20,
     },
     title: {
       fontSize: 20,

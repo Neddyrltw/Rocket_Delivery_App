@@ -22,7 +22,7 @@ const Login = () => {
 
   const navigation = useNavigation();
   const apiUrl = Constants.expoConfig?.extra?.apiUrl;
-  const { login } = useAuth();  // Access login from AuthContext
+  const { login, setAccountType } = useAuth();  // Access login from AuthContext
 
   const handleLoginPress = async () => {
     if (!email || !password) {
@@ -57,8 +57,10 @@ const Login = () => {
         if (data.customer_id && data.courier_id) {
           navigation.navigate('SelectAccountType'); // navigate to SelectAccountType if customer_id and courier_id are present
         } else if (data.customer_id) {
+          await setAccountType('Customer');
           navigation.navigate('MainCustomerPage'); // navigate to MainCustomerPage if customer_id is present
         } else if (data.courier_id) { 
+          await setAccountType('Courier')
           navigation.navigate('MainCourierPage'); //navigate to MainCourierPage if courier_id is present 
         }
       } else {
