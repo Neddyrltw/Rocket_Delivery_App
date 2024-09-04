@@ -1,12 +1,12 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faBurger, faClockRotateLeft } from '@fortawesome/free-solid-svg-icons';
+import { faBurger, faClockRotateLeft, faUser } from '@fortawesome/free-solid-svg-icons';
 
 const Footer = ({ navigation }) => {
     return (
         <View style={styles.footer}>
-            <View style={styles.leftContainer}>
+            <View style={styles.iconContainer}>
                 <TouchableOpacity
                     style={styles.button}
                     onPress={() => navigation.navigate('MainCustomerScreen')}    
@@ -15,7 +15,7 @@ const Footer = ({ navigation }) => {
                 </TouchableOpacity>
                 <Text style={styles.subtitle}>Restaurants</Text>
             </View>
-            <View style={styles.rightContainer}>
+            <View style={styles.iconContainer}>
                 <TouchableOpacity
                     style={styles.button}
                     onPress={() => navigation.navigate('OrderHistory')}
@@ -23,6 +23,15 @@ const Footer = ({ navigation }) => {
                     <FontAwesomeIcon icon={faClockRotateLeft} size={30} color="#000" />
                 </TouchableOpacity>
                 <Text style={styles.subtitle}>Order History</Text>
+            </View>
+            <View style={styles.iconContainer}>
+                <TouchableOpacity
+                    style={styles.button}
+                    onPress={() => navigation.navigate('AccountScreen')}
+                >
+                    <FontAwesomeIcon icon={faUser} size={30} color="#000" />
+                </TouchableOpacity>
+                <Text style={styles.subtitle}>Account</Text>
             </View>
         </View>
     );
@@ -32,23 +41,17 @@ const styles = StyleSheet.create({
     footer: {
         width: '100%',
         flexDirection: 'row',
-        justifyContent: 'space-between', // Ensure containers are on opposite sides
+        justifyContent: 'space-between',
         alignItems: 'center',
         backgroundColor: '#FFFFFF',
+        paddingVertical: 10,
     },
-    leftContainer: {
-        flexDirection: 'column', // Align icon and text vertically
+    iconContainer: {
+        flex: 1, 
+        flexDirection: 'column',
         alignItems: 'center',
-        marginLeft: 75, // Adjust this to move the left container as needed
-    },
-    rightContainer: {
-        flexDirection: 'column', // Align icon and text vertically
-        alignItems: 'center',
-        marginRight: 75, // Adjust this to move the right container as needed
     },
     button: {
-        width: '25%',
-        aspectRatio: 2,
         backgroundColor: '#FFFFFF',
         borderRadius: 50,
         alignItems: 'center',

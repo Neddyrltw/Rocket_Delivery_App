@@ -18,6 +18,7 @@ import CourierPage from './components/pages/CourierPage';
 import Header from './components/ui/Header';
 import Footer from './components/ui/Footer';
 import SelectAccountType from './components/pages/SelectAccountType';
+import AccountPage from './components/pages/AccountPage';
 
 const Stack = createNativeStackNavigator();
 
@@ -48,6 +49,8 @@ export default function App() {
                 <Stack.Screen name="OrderHistory" component={OrderHistoryScreen} />
                 <Stack.Screen name="SelectAccountType" component={SelectAccountType} />
                 <Stack.Screen name="MainCourierScreen" component={CourierPage} />
+                <Stack.Screen name="AccountScreen" component={AccountScreen} />
+
             </Stack.Navigator>
         </NavigationContainer>
     </AuthProvider>
@@ -92,6 +95,16 @@ const MainCourierScreen = ({ navigation }) => {
       <Footer navigation={navigation} />
     </SafeAreaView>
   );
+}
+
+const AccountScreen = ({ navigation }) => {
+  return (
+    <SafeAreaView style={styles.mainContainer}>
+      <Header />
+      <AccountPage />
+      <Footer />
+    </SafeAreaView>
+  )
 }
 
 const styles = StyleSheet.create({
