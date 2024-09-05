@@ -7,7 +7,7 @@ const MyDeliveries = () => {
   const [deliveries, setDeliveries] = useState([
     { id: '123', address: '123 Main St', status: 'delivered' },
     { id: '124', address: '456 Park Ave', status: 'pending' },
-    { id: '125', address: '789 Broadway', status: 'in transit' },
+    { id: '125', address: '789 Broadway', status: 'in progress' },
   ]);
 
   const handleViewDetails = (delivery) => {
@@ -18,13 +18,38 @@ const MyDeliveries = () => {
     switch (status.toLowerCase()) {
       case 'pending':
         return '#851919';  // Red
-      case 'in transit':
+      case 'in progress':
         return '#DA583B';  // Orange
       case 'delivered':
         return '#609475';  // Green
       default:
         return '#851919';  // Default color if status is not recognized
     }
+  };
+
+  const handleStatusChange = (id) => {
+    setDeliveries((prevDeliveries) =>
+      prevDeliveries.map((delivery) => {
+        if (delivery.id === id) {
+          let newStatus;
+          switch (delivery.status) {
+            case 'pending':
+              newStatus = 'in progress';
+              break;
+            case 'in progress':
+              newStatus = 'delivered';
+              break;
+            case 'delivered':
+              newStatus = 'pending';
+              break;
+            default:
+              newStatus = 'pending';
+          }
+          return { ...delivery, status: newStatus };
+        }
+        return delivery;
+      })
+    );
   };
 
   return (
@@ -48,7 +73,11 @@ const MyDeliveries = () => {
             <View style={styles.statusContainer}>
               <TouchableOpacity
               style={[styles.statusButton,
-              { backgroundColor: getStatusButtonColor(item.status)}]}>
+              { backgroundColor: getStatusButtonColor(item.status)
+
+              }]}
+              onPress={() => handleStatusChange(item.id)}
+              >
                 <Text style={styles.buttonText}>{item.status.toUpperCase()}</Text>
               </TouchableOpacity>
             </View>
