@@ -48,7 +48,7 @@ export default function App() {
                 <Stack.Screen name="OrderPage" component={OrderPageScreen} />
                 <Stack.Screen name="OrderHistory" component={OrderHistoryScreen} />
                 <Stack.Screen name="SelectAccountType" component={SelectAccountType} />
-                <Stack.Screen name="MainCourierScreen" component={CourierPage} />
+                <Stack.Screen name="MainCourierScreen" component={MainCourierScreen} />
                 <Stack.Screen name="AccountScreen" component={AccountScreen} />
 
             </Stack.Navigator>

@@ -11,32 +11,69 @@ import {
 import Constants from 'expo-constants';
 import { useAuth } from '../contexts/AuthContext';
 import useUserData from '../contexts/UserContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const AccountPage = () => {
+    const [email, setEmail] = useState('')
+    const [phone, setPhone] = useState('')
+
     const { user } = useAuth();
-    const { userData } = useUserData();
+    const { userData,loading, error } = useUserData();
 
     const apiUrl = Constants.expoConfig?.extra?.apiUrl;
+    const { primary_email, account_email, account_phone } = userData || {};
+    const accountType = user?.accountType.toLowerCase();
 
-    if (!userData) {
-        return <Text>Locating user data...</Text>
-    }
+    useEffect(() => {
+        if (userData) {
+            setEmail(userData.account_email);
+            setPhone(userData.account_phone);
+        }
+    }, [userData]);
 
-    const handleUpdateAccount = () => {
+    const handleUpdateAccount = async () => {
 
-        if (!account_email || !account_phone) {
+        if (!email || !phone) {
             return Alert.alert('Failure', 'Please provice a valid account email or phone number.')
         }
 
-        // try {
-        //     const 
-        // } catch (error) {
+        try {
+            // Fetch ids from storage
+            const userString = await AsyncStorage.getItem('userData');
+            const { customer_id, courier_id } = JSON.parse(userString);
+            const accountId = accountType === 'customer' ? customer_id : courier_id;
 
-        // }
-    }
+            const accountUpdatePayload = {  
+                    account_email: email,
+                    account_phone: phone,
+                    account_type: accountType
+            }
+            console.log('Payload:', accountUpdatePayload);
 
-    const { primary_email, account_email, account_phone } = userData;
-    const accountType = user?.accountType;
+            const response = await fetch(`${apiUrl}/api/account/${accountId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(accountUpdatePayload)
+        });
+        console.log('Response:', await response.text());
+
+
+        if (!response.ok) {
+            Alert.alert('Failure', 'Network response was not ok');
+            throw new Error('Network response was not ok');
+        }
+
+        Alert.alert('Success', 'Account updated successfully');
+
+        } catch (error) {
+            console.error('Error updating account information: ', error);
+        }
+    };
+
+    if (loading) return <Text>Loading...</Text>
+    if (error) return <Text>Error loading data: {error.message}</Text>
 
     return (
         <SafeAreaView style={styles.container}>
@@ -60,7 +97,9 @@ const AccountPage = () => {
                     <Text style={styles.label}>{accountType} Email</Text>
                     <TextInput
                         style={styles.input}
-                        value={account_email}
+                        value={email}
+                        onChangeText={setEmail}
+                        autoCorrect={false}
                     />
                     <Text style={styles.subtitle}>Email used for your {accountType} account.</Text>
                 </View>
@@ -69,13 +108,16 @@ const AccountPage = () => {
                     <Text style={styles.label}>{accountType} Phone</Text>
                     <TextInput
                         style={styles.input}
-                        value={account_phone}
+                        value={phone}
+                        onChangeText={setPhone}
+                        autoCorrect={false}
                     />
                     <Text style={styles.subtitle}>Phone number used for your {accountType} account.</Text>
                 </View>
                 <View style={styles.buttonContainer}>
                     <TouchableOpacity
                         style={styles.button}
+                        onPress={handleUpdateAccount}
                     >
                         <Text style={styles.buttonText}>UPDATE ACCOUNT</Text>
                     </TouchableOpacity>
@@ -130,6 +172,7 @@ const styles = StyleSheet.create({
         borderRadius: 5,
     },
     buttonText: {
+        fontSize: 18,
         padding: 10,
         color: '#fff',
 

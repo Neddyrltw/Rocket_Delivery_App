@@ -1,41 +1,90 @@
-import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, Text, TouchableOpacity, View, Dimensions } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faBurger, faClockRotateLeft, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faBurger, faClockRotateLeft, faUser, faTruck } from '@fortawesome/free-solid-svg-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Footer = ({ navigation }) => {
+    const [accountType, SetAccountType] = useState(null);
+
+    const { width } = Dimensions.get('window'); // get screen width
+    const iconSize = width * 0.05; // icon size as 5% of the screen width
+
+    useEffect(() => {
+        const fetchAccountType = async () => {
+            const userString = await AsyncStorage.getItem('userData');
+            if (userString) {
+                const { accountType } = JSON.parse(userString)
+                SetAccountType(accountType.toLowerCase());
+            }
+        };
+
+        fetchAccountType();
+    }, []);
+
     return (
         <View style={styles.footer}>
-            <View style={styles.iconContainer}>
+          {accountType === 'customer' && (
+            <>
+              <View style={styles.iconContainer}>
                 <TouchableOpacity
-                    style={styles.button}
-                    onPress={() => navigation.navigate('MainCustomerScreen')}    
+                  style={styles.button}
+                  onPress={() => navigation.navigate('MainCustomerScreen')}
                 >
-                    <FontAwesomeIcon icon={faBurger} size={30} color="#000" />
+                  <FontAwesomeIcon
+                  style={styles.icon}
+                  size={iconSize}
+                  icon={faBurger} />
+                  <Text style={styles.subtitle}>Restaurants</Text>
                 </TouchableOpacity>
-                <Text style={styles.subtitle}>Restaurants</Text>
-            </View>
-            <View style={styles.iconContainer}>
+              </View>
+              <View style={styles.iconContainer}>
                 <TouchableOpacity
-                    style={styles.button}
-                    onPress={() => navigation.navigate('OrderHistory')}
+                  style={styles.button}
+                  onPress={() => navigation.navigate('OrderHistory')}
                 >
-                    <FontAwesomeIcon icon={faClockRotateLeft} size={30} color="#000" />
+                  <FontAwesomeIcon
+                    style={styles.icon}
+                    size={iconSize}
+                    icon={faClockRotateLeft} />
+                  <Text style={styles.subtitle}>Order History</Text>
                 </TouchableOpacity>
-                <Text style={styles.subtitle}>Order History</Text>
-            </View>
-            <View style={styles.iconContainer}>
+              </View>
+            </>
+          )}
+    
+          {accountType === 'courier' && (
+            <>
+              <View style={styles.iconContainer}>
                 <TouchableOpacity
-                    style={styles.button}
-                    onPress={() => navigation.navigate('AccountScreen')}
+                  style={styles.button}
+                  onPress={() => navigation.navigate('DeliveriesScreen')}
                 >
-                    <FontAwesomeIcon icon={faUser} size={30} color="#000" />
+                  <FontAwesomeIcon
+                  style={styles.icon}
+                  size={iconSize}
+                  icon={faTruck} />
                 </TouchableOpacity>
-                <Text style={styles.subtitle}>Account</Text>
-            </View>
+                <Text style={styles.subtitle}>Deliveries</Text>
+              </View>
+            </>
+          )}
+    
+          <View style={styles.iconContainer}>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => navigation.navigate('AccountScreen')}
+            >
+              <FontAwesomeIcon
+              style={styles.icon}
+              size={iconSize}
+              icon={faUser} />
+              <Text style={styles.subtitle}>Restaurants</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-    );
-};
+      );
+    };
 
 const styles = StyleSheet.create({
     footer: {
@@ -44,12 +93,14 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         backgroundColor: '#FFFFFF',
-        paddingVertical: 10,
     },
     iconContainer: {
         flex: 1, 
         flexDirection: 'column',
         alignItems: 'center',
+    },
+    icon: {
+        color:'#000',
     },
     button: {
         backgroundColor: '#FFFFFF',
