@@ -91,7 +91,7 @@ const MainCourierScreen = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.mainContainer}>
       <Header />
-      <OrderHistory />
+      <CourierPage />
       <Footer navigation={navigation} />
     </SafeAreaView>
   );
@@ -102,7 +102,7 @@ const AccountScreen = ({ navigation }) => {
     <SafeAreaView style={styles.mainContainer}>
       <Header />
       <AccountPage />
-      <Footer />
+      <Footer navigation={navigation} />
     </SafeAreaView>
   )
 }

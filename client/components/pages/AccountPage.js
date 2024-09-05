@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import {
+    Alert,
     StyleSheet,
     Text,
     TextInput,
     View,
-    SafeAreaView
+    SafeAreaView,
+    TouchableOpacity
 } from 'react-native';
+import Constants from 'expo-constants';
 import { useAuth } from '../contexts/AuthContext';
 import useUserData from '../contexts/UserContext';
 
@@ -13,8 +16,23 @@ const AccountPage = () => {
     const { user } = useAuth();
     const { userData } = useUserData();
 
+    const apiUrl = Constants.expoConfig?.extra?.apiUrl;
+
     if (!userData) {
         return <Text>Locating user data...</Text>
+    }
+
+    const handleUpdateAccount = () => {
+
+        if (!account_email || !account_phone) {
+            return Alert.alert('Failure', 'Please provice a valid account email or phone number.')
+        }
+
+        // try {
+        //     const 
+        // } catch (error) {
+
+        // }
     }
 
     const { primary_email, account_email, account_phone } = userData;
@@ -35,6 +53,7 @@ const AccountPage = () => {
                         value={primary_email}
                         editable={false}
                     />
+                    <Text style={styles.subtitle}>Email used to log in to the application.</Text>
                 </View>
 
                 <View style={styles.inputContainer}>
@@ -43,6 +62,7 @@ const AccountPage = () => {
                         style={styles.input}
                         value={account_email}
                     />
+                    <Text style={styles.subtitle}>Email used for your {accountType} account.</Text>
                 </View>
 
                 <View style={styles.inputContainer}>
@@ -51,6 +71,14 @@ const AccountPage = () => {
                         style={styles.input}
                         value={account_phone}
                     />
+                    <Text style={styles.subtitle}>Phone number used for your {accountType} account.</Text>
+                </View>
+                <View style={styles.buttonContainer}>
+                    <TouchableOpacity
+                        style={styles.button}
+                    >
+                        <Text style={styles.buttonText}>UPDATE ACCOUNT</Text>
+                    </TouchableOpacity>
                 </View>
         </SafeAreaView>
     );
@@ -59,7 +87,6 @@ const AccountPage = () => {
 const styles = StyleSheet.create({
     container: {
       flex: 1,
-      padding: 16,
       margin: 30,
     },
     pageHeader: {
@@ -68,28 +95,47 @@ const styles = StyleSheet.create({
     headerText: {
         fontSize: 20,
         fontFamily: 'Oswald',
-        fontWeight: 'bold'
-
+    },
+    headerSubtitle: {
+        paddingBottom: 20,
     },
     inputContainer: {
       marginBottom: 20,
     },
     label: {
-      fontSize: 16,
+      fontSize: 12,
       color: '#333',
       marginBottom: 8,
     },
     input: {
       height: 40,
-      borderColor: '#CCC',
+      borderColor: '#ccc',
       borderWidth: 1,
       paddingHorizontal: 8,
       borderRadius: 4,
+      backgroundColor: '#fff',
+    },
+    subtitle: {
+        fontSize: 10,
+        color: '#aaa'
     },
     readOnlyInput: {
       backgroundColor: '#F0F0F0',
     },
+    buttonContainer: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 20,
+        backgroundColor: '#DA583B',
+        borderRadius: 5,
+    },
+    buttonText: {
+        padding: 10,
+        color: '#fff',
+
+    }
   });
+  
   
 
 export default AccountPage;

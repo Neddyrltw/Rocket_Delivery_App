@@ -25,6 +25,7 @@ const Login = () => {
   const { login, setAccountType } = useAuth();  // Access login from AuthContext
 
   const handleLoginPress = async () => {
+    
     if (!email || !password) {
       showError('Please enter valid email and password.');
       return;
