@@ -50,13 +50,14 @@ export default function App() {
                 <Stack.Screen name="SelectAccountType" component={SelectAccountType} />
                 <Stack.Screen name="MainCourierScreen" component={MainCourierScreen} />
                 <Stack.Screen name="AccountScreen" component={AccountScreen} />
-
             </Stack.Navigator>
         </NavigationContainer>
     </AuthProvider>
   );
 }
 
+
+// Look into conditional rendering for header/footer
 const MainCustomerScreen = ({ navigation }) => {
     return(
         <SafeAreaView style={styles.mainContainer}>

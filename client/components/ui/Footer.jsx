@@ -79,7 +79,7 @@ const Footer = ({ navigation }) => {
               style={styles.icon}
               size={iconSize}
               icon={faUser} />
-              <Text style={styles.subtitle}>Restaurants</Text>
+              <Text style={styles.subtitle}>Account</Text>
             </TouchableOpacity>
           </View>
         </View>
