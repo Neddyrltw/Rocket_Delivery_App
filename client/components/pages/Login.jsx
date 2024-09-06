@@ -56,13 +56,13 @@ const Login = () => {
         
         // Navigate based on user role
         if (data.customer_id && data.courier_id) {
-          navigation.navigate('SelectAccountType'); // navigate to SelectAccountType if customer_id and courier_id are present
+          navigation.navigate('MainStack', { screen: 'SelectAccountType' });
         } else if (data.customer_id) {
           await setAccountType('customer');
-          navigation.navigate('MainCustomerPage'); // navigate to MainCustomerPage if customer_id is present
+          navigation.navigate('MainStack', { screen: 'MainCustomerPage' }); // navigate to MainCustomerPage if customer_id is present
         } else if (data.courier_id) { 
           await setAccountType('courier')
-          navigation.navigate('MainCourierPage'); //navigate to MainCourierPage if courier_id is present 
+          navigation.navigate('MainStack', { screen: 'MainCourierScreen' }); //navigate to MainCourierPage if courier_id is present 
         }
       } else {
         showError('Invalid email or password.');

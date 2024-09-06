@@ -20,7 +20,8 @@ import Footer from './components/ui/Footer';
 import SelectAccountType from './components/pages/SelectAccountType';
 import AccountPage from './components/pages/AccountPage';
 
-const Stack = createNativeStackNavigator();
+const AuthStack = createNativeStackNavigator();
+const MainStack = createNativeStackNavigator();
 
 export default function App() {
   const [fontsLoaded, setFontsLoaded] = useState(false);
@@ -41,21 +42,41 @@ export default function App() {
 
   return (
     <AuthProvider>
-        <NavigationContainer>
-            <Stack.Navigator screenOptions={{ headerShown: false}}>
-                <Stack.Screen name="Login" component={Login} />
-                <Stack.Screen name="MainCustomerScreen" component={MainCustomerScreen} />
-                <Stack.Screen name="OrderPage" component={OrderPageScreen} />
-                <Stack.Screen name="OrderHistory" component={OrderHistoryScreen} />
-                <Stack.Screen name="SelectAccountType" component={SelectAccountType} />
-                <Stack.Screen name="MainCourierScreen" component={MainCourierScreen} />
-                <Stack.Screen name="AccountScreen" component={AccountScreen} />
-            </Stack.Navigator>
-        </NavigationContainer>
+      <NavigationContainer>
+        {/* Root Navigator */}
+        <MainStack.Navigator screenOptions={{ headerShown: false }}>
+          {/* Authentication flow */}
+          <MainStack.Screen name="AuthStack" component={AuthFlow} />
+          {/* Main app flow */}
+          <MainStack.Screen name="MainStack" component={MainFlow} />
+        </MainStack.Navigator>
+      </NavigationContainer>
     </AuthProvider>
   );
 }
 
+// Authentication Flow Stack
+const AuthFlow = () => {
+  return (
+    <AuthStack.Navigator screenOptions={{ headerShown: false }}>
+      <AuthStack.Screen name="Login" component={Login} />
+    </AuthStack.Navigator>
+  );
+};
+
+// Main App Flow Stack
+const MainFlow = () => {
+  return (
+    <MainStack.Navigator screenOptions={{ headerShown: false }}>
+      <MainStack.Screen name="SelectAccountType" component={SelectAccountType} />
+      <MainStack.Screen name="MainCustomerScreen" component={MainCustomerScreen} />
+      <MainStack.Screen name="OrderPage" component={OrderPageScreen} />
+      <MainStack.Screen name="OrderHistory" component={OrderHistoryScreen} />
+      <MainStack.Screen name="MainCourierScreen" component={MainCourierScreen} />
+      <MainStack.Screen name="AccountScreen" component={AccountScreen} />
+    </MainStack.Navigator>
+  );
+};
 
 // Look into conditional rendering for header/footer
 const MainCustomerScreen = ({ navigation }) => {

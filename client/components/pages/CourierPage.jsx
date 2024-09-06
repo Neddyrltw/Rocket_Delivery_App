@@ -5,10 +5,14 @@ import { faMagnifyingGlassPlus } from '@fortawesome/free-solid-svg-icons';
 import Constants from 'expo-constants';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import DeliveryDetailsModal from '../modals/DeliveryDetailsModal';
+
 const CourierPage = () => {
   const [deliveries, setDeliveries] = useState([]);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedDelivery, setSelectedDelivery] = useState(null);
   
   const apiUrl = Constants.expoConfig?.extra?.apiUrl;
 
@@ -66,6 +70,8 @@ const CourierPage = () => {
   };
 
   const handleViewDetails = (item) => {
+    setSelectedDelivery(item);
+    setModalVisible(true);
   };
 
   const getStatusButtonColor = (status) => {
@@ -152,11 +158,22 @@ const CourierPage = () => {
                 <Text style={styles.buttonText}>{item.status.toUpperCase()}</Text>
               </TouchableOpacity>
             </View>
-            <TouchableOpacity style={styles.iconCell} onPress={() => handleViewDetails(item)}>
-              <FontAwesomeIcon style={styles.icon} icon={faMagnifyingGlassPlus} />
+            <TouchableOpacity
+              style={styles.iconCell}
+              onPress={() => handleViewDetails(item)}
+            >
+              <FontAwesomeIcon
+                style={styles.icon}
+                icon={faMagnifyingGlassPlus} />
             </TouchableOpacity>
           </View>
         )}
+      />
+      {/* Render the DeliveryDetailsModal */}
+      <DeliveryDetailsModal
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)}
+        deliveryDetails={selectedDelivery}
       />
     </SafeAreaView>
   );
@@ -171,6 +188,7 @@ const styles = StyleSheet.create({
   },
   pageHeader: {
     padding: 10,
+
   },
   pageHeaderText: {
     fontSize: 20,
@@ -181,6 +199,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     backgroundColor: '#222126',
+    borderTopLeftRadius: 5,
+    borderTopRightRadius: 5,
     borderBottomWidth: 1,
     borderBottomColor: '#DDD',
     paddingVertical: 10,

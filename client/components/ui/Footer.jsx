@@ -58,7 +58,7 @@ const Footer = ({ navigation }) => {
               <View style={styles.iconContainer}>
                 <TouchableOpacity
                   style={styles.button}
-                  onPress={() => navigation.navigate('DeliveriesScreen')}
+                  onPress={() => navigation.navigate('MainCourierScreen')}
                 >
                   <FontAwesomeIcon
                   style={styles.icon}

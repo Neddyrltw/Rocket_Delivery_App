@@ -91,8 +91,14 @@ const OrderHistory = () => {
           <View style={styles.tableRow}>
             <Text style={styles.cellText}>{item.restaurant_name}</Text>
             <Text style={styles.cellText}>{item.status.toUpperCase()}</Text>
-            <TouchableOpacity style={styles.iconCell} onPress={() => handleViewDetails(item)}>
-              <FontAwesomeIcon style={styles.icon} icon={faMagnifyingGlassPlus} />
+            <TouchableOpacity
+              style={styles.iconCell}
+              onPress={() => handleViewDetails(item)}
+            >
+              <FontAwesomeIcon
+                style={styles.icon}
+                icon={faMagnifyingGlassPlus}
+              />
             </TouchableOpacity>
           </View>
         )}
