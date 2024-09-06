@@ -1,17 +1,71 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Text, View, SafeAreaView, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faMagnifyingGlassPlus } from '@fortawesome/free-solid-svg-icons';
+import Constants from 'expo-constants';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const MyDeliveries = () => {
-  const [deliveries, setDeliveries] = useState([
-    { id: '123', address: '123 Main St', status: 'delivered' },
-    { id: '124', address: '456 Park Ave', status: 'pending' },
-    { id: '125', address: '789 Broadway', status: 'in progress' },
-  ]);
+const CourierPage = () => {
+  const [deliveries, setDeliveries] = useState([]);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
+  
+  const apiUrl = Constants.expoConfig?.extra?.apiUrl;
 
-  const handleViewDetails = (delivery) => {
-    // Placeholder function for viewing delivery details
+  useEffect(() => {
+    const fetchDeliveries = async () => {
+
+      try {
+        // Fetch user data from AsyncStorage
+        const userData = await AsyncStorage.getItem('user');
+
+        if (userData) {
+          const { courier_id } = JSON.parse(userData);
+          
+          if (courier_id) {
+            const type = 'courier';
+
+            // Fetch deliveries for the courier
+            const response = await fetch(`${apiUrl}/api/orders?id=${courier_id}&type=${type}`, {
+              method: 'GET',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+            });
+
+            if (!response.ok) {
+              throw new Error(`Failed to fetch deliveries, status: ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            // Sort deliveries by date descending
+            const sortedDeliveries = data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+            setDeliveries(sortedDeliveries);
+
+          } else {
+            throw new Error('Courier ID not found in user data');
+          }
+        } else {
+          throw new Error('User data not found in AsyncStorage');
+        }
+      } catch (error) {
+        console.error('Fetch error: ', error);
+        setError(error.message);
+
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDeliveries();
+  }, []);
+
+  const trimmedAddress = (fullAddress) => {
+    return fullAddress.split(',')[0];
+  };
+
+  const handleViewDetails = (item) => {
   };
 
   const getStatusButtonColor = (status) => {
@@ -21,35 +75,49 @@ const MyDeliveries = () => {
       case 'in progress':
         return '#DA583B';  // Orange
       case 'delivered':
-        return '#609475';  // Green
+        return '#9ACDA7';  // Green
       default:
         return '#851919';  // Default color if status is not recognized
     }
   };
 
-  const handleStatusChange = (id) => {
-    setDeliveries((prevDeliveries) =>
-      prevDeliveries.map((delivery) => {
-        if (delivery.id === id) {
-          let newStatus;
-          switch (delivery.status) {
-            case 'pending':
-              newStatus = 'in progress';
-              break;
-            case 'in progress':
-              newStatus = 'delivered';
-              break;
-            case 'delivered':
-              newStatus = 'pending';
-              break;
-            default:
-              newStatus = 'pending';
-          }
-          return { ...delivery, status: newStatus };
-        }
-        return delivery;
-      })
+  const handleStatusChange = async (id, currentStatus) => {
+    let newStatus;
+
+    switch (currentStatus) {
+      case 'pending':
+        newStatus = 'in progress';
+        break;
+      case 'in progress':
+        newStatus = 'delivered';
+        break;
+      default:
+        newStatus = 'pending'
+    } 
+
+    try {
+      // Api call to update status
+      const response = await fetch(`${apiUrl}/api/order/${id}/status`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status: newStatus })
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to update order status, status: ${response.status}`);
+    }
+
+    // Update state  if the API  call is successful
+    setDeliveries((prevDeliveries) => 
+      prevDeliveries.map((delivery) =>
+        delivery.id === id ? { ...delivery, status: newStatus } : delivery
+      )
     );
+    } catch (error) {
+      console.error('Error updating status: ', error);
+    }
   };
 
   return (
@@ -69,14 +137,17 @@ const MyDeliveries = () => {
         renderItem={({ item }) => (
           <View style={styles.tableRow}>
             <Text style={[styles.cellText, styles.orderIdColumn]}>{item.id}</Text>
-            <Text style={[styles.cellText, styles.addressColumn]}>{item.address}</Text>
+            <Text style={[styles.cellText, styles.addressColumn]}>
+              {trimmedAddress(item.customer_address)}
+            </Text>
             <View style={styles.statusContainer}>
               <TouchableOpacity
-              style={[styles.statusButton,
-              { backgroundColor: getStatusButtonColor(item.status)
-
-              }]}
-              onPress={() => handleStatusChange(item.id)}
+                style={[
+                  styles.statusButton,
+                  { backgroundColor: getStatusButtonColor(item.status) }
+                ]}
+                onPress={() => handleStatusChange(item.id, item.status)}
+                disabled={item.status.toLowerCase() === 'delivered'}
               >
                 <Text style={styles.buttonText}>{item.status.toUpperCase()}</Text>
               </TouchableOpacity>
@@ -112,14 +183,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#222126',
     borderBottomWidth: 1,
     borderBottomColor: '#DDD',
-    paddingVertical: 10,  // Adjust padding to align with rows
+    paddingVertical: 10,
   },
   headerText: {
     fontWeight: 'bold',
     fontSize: 16,
     color: 'white',
     textAlign: 'center',
-    flex: 1,  // Adjust to fill available space
+    flex: 1,
   },
   tableRow: {
     flexDirection: 'row',
@@ -131,17 +202,17 @@ const styles = StyleSheet.create({
   cellText: {
     textAlign: 'center',
     flex: 1,
-    paddingVertical: 10,  
+    paddingVertical: 10,
   },
   orderIdColumn: {
-    flex: 0.75, 
+    flex: 0.75,
     paddingLeft: 5,
   },
   addressColumn: {
-    flex: 2,  
+    flex: 2,
   },
   statusColumn: {
-    flex: 1.5,  
+    flex: 1.5,
   },
   statusContainer: {
     flex: 1.5,
@@ -174,6 +245,4 @@ const styles = StyleSheet.create({
   },
 });
 
-  
-
-export default MyDeliveries;
+export default CourierPage;
