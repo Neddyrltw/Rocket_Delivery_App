@@ -1,5 +1,5 @@
 // OrderHistoryModal.js
-import React from 'react';
+import React, { useState } from 'react';
 import {
     View,
     Text,
@@ -8,8 +8,10 @@ import {
     TouchableOpacity,
     FlatList
 } from 'react-native';
+import StarRating from '../common/StarRating';
 
 const OrderHistoryModal = ({ visible, onClose, order }) => {
+    const [rating, setRating] = useState(0)
 
     // Use products array from the order object
     const orderItems = order.products || [];
@@ -22,7 +24,7 @@ const OrderHistoryModal = ({ visible, onClose, order }) => {
             currency: 'USD',
         }).format(amountInDollars);
     };
-
+    
     return (
         <Modal
             animationType="slide"
@@ -37,7 +39,13 @@ const OrderHistoryModal = ({ visible, onClose, order }) => {
                             <Text style={styles.restaurantText}>{order.restaurant_name}</Text>
                             <Text style={styles.detailText}>Order Date: {new Date(order.created_at).toLocaleDateString()}</Text>
                             <Text style={styles.detailText}>Status: {order.status.toUpperCase()}</Text>
-                            <Text style={styles.detailText}>Courier:{order.courier_name}</Text>
+                            <Text style={styles.detailText}>Courier: {order.courier_name}</Text>
+                            <Text style={styles.ratingText}>Rate Your Experience:</Text>
+                            <StarRating 
+                                maxStars={5}
+                                initialRating={rating}
+                                onRatingChange={(newRating) => setRating(newRating)}
+                            />
                         </View>
                         <TouchableOpacity style={styles.closeButton} onPress={onClose}>
                             <Text style={styles.closeButtonIcon}>X</Text>
@@ -104,7 +112,13 @@ const styles = StyleSheet.create({
     },
     detailText: {
         fontSize: 14,
-        color: 'white',
+        color: '#fff',
+    },
+    ratingText: {
+        fontSize: 14,
+        color: '#fff',
+        textAlign: 'center',
+        marginTop: 10,
     },
     contentContainer: {
         flexGrow: 1,
