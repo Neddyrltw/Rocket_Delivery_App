@@ -44,6 +44,7 @@ const OrderHistoryModal = ({ visible, onClose, order }) => {
                             <StarRating 
                                 maxStars={5}
                                 initialRating={rating}
+                                orderId={order.id}
                                 onRatingChange={(newRating) => setRating(newRating)}
                             />
                         </View>

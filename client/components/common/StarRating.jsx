@@ -9,13 +9,39 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faStar } from '@fortawesome/free-solid-svg-icons';
 import  { faStar as faStarOutline } from '@fortawesome/free-regular-svg-icons';
+import Constants from 'expo-constants';
 
 const { width } = Dimensions.get('window');
 
 const iconSize = (percentage) => (width * percentage) / 100;
+const apiUrl = Constants.expoConfig?.extra?.apiUrl;
 
-const StarRating = ({ maxStars = 5, initialRating = 0, onRatingChange }) => {
+const StarRating = ({ maxStars = 5, initialRating = 0, orderId, onRatingChange }) => {
     const [rating, setRating] = useState(initialRating); // initial rating
+
+    const updateRating = async (newRating) => {
+
+        try {
+            const response = await fetch(`${apiUrl}/api/order/${orderId}/rating`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ restaurant_rating: newRating }),
+            });
+
+            console.log('Response status:', response.status);
+
+            if (!response.ok) {
+                console.error('Failed to update rating: ', await response.json());
+            } else {
+                console.log('Rating updated successfully: ,',  await response.json());
+            }
+
+        } catch (error) {
+            console.error('Error updating rating: ', error);
+        }
+    }
 
     // Determines which index star occupies in array
     const handleStarPress = (index) => {
@@ -23,11 +49,16 @@ const StarRating = ({ maxStars = 5, initialRating = 0, onRatingChange }) => {
         // Adds 1 to convert 0-based indexing
         const newRating = index + 1;
 
+        console.log('Star pressed, updating rating to:', newRating);
+
         // Update state
         setRating(newRating); 
 
         // Parent callback
         onRatingChange && onRatingChange(newRating); 
+
+        // Call the API
+        updateRating(newRating);
     };
 
     return (
@@ -39,8 +70,8 @@ const StarRating = ({ maxStars = 5, initialRating = 0, onRatingChange }) => {
                 >
                     <FontAwesomeIcon
                         icon={index < rating ? faStar : faStarOutline}
-                        size={iconSize(6)} // Set size dynamically (8% of screen width)
-                        color={index < rating ? '#851919' : '#DA583B'} // Gold for filled, Silver for outline
+                        size={iconSize(6)} // Set size dynamically to 6% of width
+                        color={index < rating ? '#851919' : '#DA583B'} // 
                         style={styles.starIcon}
                     />
                 </TouchableOpacity>
@@ -55,7 +86,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     starIcon: {
-        marginHorizontal: 2, // Add margin for spacing between stars
+        marginHorizontal: 2,
     },
 });
 
