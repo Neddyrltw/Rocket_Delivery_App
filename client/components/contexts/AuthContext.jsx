@@ -1,4 +1,9 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import React, {
+  createContext,
+  useState,
+  useEffect, 
+  useContext
+} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const AuthContext = createContext();
@@ -11,9 +16,14 @@ export const AuthProvider = ({ children }) => {
 
       try { 
         const storedUser = await AsyncStorage.getItem('userData');
+        console.log('Raw user data from AsyncStorage:', storedUser);
+
         if (storedUser) {
-          setUser(JSON.parse(storedUser));
-        }
+          const parsedUser = JSON.parse(storedUser);
+          console.log('Loaded user from AsyncStorage:', parsedUser);
+          setUser(parsedUser);
+        } else {
+          console.log('No user data found in AsyncStorage');        }
       } catch (error) {
         console.error('Failed to load user data:', error);
       }
@@ -46,7 +56,8 @@ export const AuthProvider = ({ children }) => {
     try {
       const updatedUser = { ...user, accountType: type};
       setUser(updatedUser);
-      await AsyncStorage .setItem('userData', JSON.stringify(updatedUser));
+      await AsyncStorage.setItem('userData', JSON.stringify(updatedUser));
+      console.log('Account type set to:', type); // Debug line
     } catch (err) {
       console.error('Failed to set account type: ', err);
     }

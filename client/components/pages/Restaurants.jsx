@@ -21,6 +21,7 @@ const Restaurants = () => {
     const { userData, loading, error } = useUserData();
     const apiUrl = Constants.expoConfig?.extra?.apiUrl;
 
+
     const ratingOptions = [
         { key: 'clear', label: 'Clear Selection' }, // Add clear option
         { key: 1, label: '1 Star' },

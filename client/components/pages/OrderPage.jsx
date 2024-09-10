@@ -25,7 +25,7 @@ const OrderPage = ({ route }) => {
         const fetchData = async () => {
             try {
                 // Fetch customer id
-                const userData = await AsyncStorage.getItem('user');
+                const userData = await AsyncStorage.getItem('userData');
                 if (userData) {
                     const { customer_id } = JSON.parse(userData);
                     setCustomerId(customer_id);

@@ -3,13 +3,12 @@ import {
     ActivityIndicator,
     SafeAreaView,
     StyleSheet,
-    View
 } from 'react-native';
 import * as Font from 'expo-font';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { AuthProvider } from './components/contexts/AuthContext';
-
+import { useAuth } from './components/contexts/AuthContext';
 import Login from './components/pages/Login';
 import Restaurants from './components/pages/Restaurants';
 import OrderPage from './components/pages/OrderPage';
@@ -19,6 +18,7 @@ import Header from './components/ui/Header';
 import Footer from './components/ui/Footer';
 import SelectAccountType from './components/pages/SelectAccountType';
 import AccountPage from './components/pages/AccountPage';
+import RestaurantCard from './components/ui/RestaurantCard';
 
 const AuthStack = createNativeStackNavigator();
 const MainStack = createNativeStackNavigator();
@@ -66,14 +66,21 @@ const AuthFlow = () => {
 
 // Main App Flow Stack
 const MainFlow = () => {
+  const { user } = useAuth();  // get user data
+
   return (
     <MainStack.Navigator screenOptions={{ headerShown: false }}>
-      <MainStack.Screen name="SelectAccountType" component={SelectAccountType} />
-      <MainStack.Screen name="MainCustomerScreen" component={MainCustomerScreen} />
-      <MainStack.Screen name="OrderPage" component={OrderPageScreen} />
-      <MainStack.Screen name="OrderHistory" component={OrderHistoryScreen} />
-      <MainStack.Screen name="MainCourierScreen" component={MainCourierScreen} />
-      <MainStack.Screen name="AccountScreen" component={AccountScreen} />
+      {user?.accountType ? (
+        <>
+          <MainStack.Screen name="MainCustomerScreen" component={MainCustomerScreen} />
+          <MainStack.Screen name="OrderPage" component={OrderPageScreen} />
+          <MainStack.Screen name="OrderHistory" component={OrderHistoryScreen} />
+          <MainStack.Screen name="MainCourierScreen" component={MainCourierScreen} />
+          <MainStack.Screen name="AccountScreen" component={AccountScreen} />
+        </>
+      ) : (
+        <MainStack.Screen name="SelectAccountType" component={SelectAccountType} />
+      )}
     </MainStack.Navigator>
   );
 };

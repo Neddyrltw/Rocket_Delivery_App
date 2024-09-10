@@ -50,19 +50,23 @@ const Login = () => {
         };
 
         await login(user);  // Use login from AuthContext
-        console.log('User logged in:', user);
         Alert.alert('Success', 'Logged in successfully!');
         setErrorMessage('');
         
+        console.log('customer_id:', data.customer_id);
+        console.log('courier_id:', data.courier_id);
+
         // Navigate based on user role
-        if (data.customer_id && data.courier_id) {
-          navigation.navigate('MainStack', { screen: 'SelectAccountType' });
-        } else if (data.customer_id) {
-          await setAccountType('customer');
-          navigation.navigate('MainStack', { screen: 'MainCustomerPage' }); // navigate to MainCustomerPage if customer_id is present
-        } else if (data.courier_id) { 
-          await setAccountType('courier')
-          navigation.navigate('MainStack', { screen: 'MainCourierScreen' }); //navigate to MainCourierPage if courier_id is present 
+        if (data.customer_id && !data.courier_id) {
+           await setAccountType('customer');
+          navigation.navigate('MainStack', { screen: 'MainCustomerPage' });
+        } else if (data.courier_id && !data.customer_id) {
+          await setAccountType('courier');
+          navigation.navigate('MainStack', { screen: 'MainCourierScreen'});
+        } else if (data.customer_id && data.courier_id) {
+          navigation.navigate('MainStack', {screen: 'SelectAccountType'});
+        } else {
+          showError('No valid accounty type found');
         }
       } else {
         showError('Invalid email or password.');

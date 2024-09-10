@@ -21,7 +21,7 @@ const CourierPage = () => {
 
       try {
         // Fetch user data from AsyncStorage
-        const userData = await AsyncStorage.getItem('user');
+        const userData = await AsyncStorage.getItem('userData');
 
         if (userData) {
           const { courier_id } = JSON.parse(userData);
