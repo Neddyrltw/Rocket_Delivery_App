@@ -27,8 +27,7 @@ const SelectAccountType = () => {
         try {
             const formattedAccountType = type.toLowerCase(); // Convert type to lowercase
             await setAccountType(formattedAccountType);
-            console.log('Type: ', type);
-            console.log(`Navigating to ${formattedAccountType === 'customer' ? 'MainCustomerScreen' : 'MainCourierScreen'}`);
+            
             navigation.navigate(formattedAccountType === 'customer' ? 'MainCustomerScreen' : 'MainCourierScreen');
         } catch (err) { 
             console.error('Error setting account type: ', err);

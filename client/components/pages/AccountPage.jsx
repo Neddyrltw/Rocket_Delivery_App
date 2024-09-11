@@ -10,26 +10,41 @@ import {
 } from 'react-native';
 import Constants from 'expo-constants';
 import { useAuth } from '../contexts/AuthContext';
-import useUserData from '../contexts/UserContext';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const AccountPage = () => {
     const [email, setEmail] = useState('')
     const [phone, setPhone] = useState('')
+    const [primaryEmail, setPrimaryEmail] = useState('');
+    const [loading, setloading] = useState(true);
+    const [error, setError] = useState(null);
 
-    const { user } = useAuth();
-    const { userData,loading, error } = useUserData();
+    const { userState } = useAuth();
+    const { user_id, accountType } = userState;
 
     const apiUrl = Constants.expoConfig?.extra?.apiUrl;
-    const { primary_email, account_email, account_phone } = userData || {};
-    const accountType = user?.accountType.toLowerCase();
 
     useEffect(() => {
-        if (userData) {
-            setEmail(userData.account_email);
-            setPhone(userData.account_phone);
-        }
-    }, [userData]);
+        const fetchUserData = async () => {
+            try {
+                const response = await fetch(`${apiUrl}/api/account/${user_id}?type=${accountType.toLowerCase()}`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch user data');
+                }
+
+                const data = await response.json();
+                setEmail(data.account_email);
+                setPhone(data.account_phone);
+                setPrimaryEmail(data.primary_email);
+            } catch (error) {
+                console.error('Error fetching data: ', error);
+                setError(error);
+            } finally {
+                setloading(false);
+            }
+        };
+
+        fetchUserData();
+    }, []);
 
     const handleUpdateAccount = async () => {
 
@@ -38,37 +53,29 @@ const AccountPage = () => {
         }
 
         try {
-            // Fetch ids from storage
-            const userString = await AsyncStorage.getItem('userData');
-            const { customer_id, courier_id } = JSON.parse(userString);
-            const accountId = accountType === 'customer' ? customer_id : courier_id;
+           
+            const accountUpdatePayload = {
+                account_email: email,
+                account_phone: phone,
+                account_type: accountType.toLowerCase()
+            };
 
-            const accountUpdatePayload = {  
-                    account_email: email,
-                    account_phone: phone,
-                    account_type: accountType
-            }
-            console.log('Payload:', accountUpdatePayload);
-
-            const response = await fetch(`${apiUrl}/api/account/${accountId}`, {
+            const response = await fetch(`${apiUrl}/api/account/${user_id}`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(accountUpdatePayload)
-        });
-        console.log('Response:', await response.text());
+            });
 
+            if (!response.ok) {
+                Alert.alert('Failure', 'Network response was not ok');
+            }
 
-        if (!response.ok) {
-            Alert.alert('Failure', 'Network response was not ok');
-            throw new Error('Network response was not ok');
-        }
-
-        Alert.alert('Success', 'Account updated successfully');
+            Alert.alert('Success', 'Account updated successfully');
 
         } catch (error) {
-            console.error('Error updating account information: ', error);
+            console.error('Error updating account information:', error);
         }
     };
 
@@ -87,7 +94,7 @@ const AccountPage = () => {
                     <Text style={styles.label}>Primary Email</Text>
                     <TextInput
                         style={[styles.input, styles.readOnlyInput]}
-                        value={primary_email}
+                        value={primaryEmail}
                         editable={false}
                     />
                     <Text style={styles.subtitle}>Email used to log in to the application.</Text>

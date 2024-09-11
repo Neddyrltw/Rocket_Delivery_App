@@ -43,7 +43,6 @@ const Restaurants = () => {
             fetch(`${apiUrl}/api/restaurants`)
                 .then((response) => response.json())
                 .then((data) => {
-                    console.log("Fetched restaurants:", data);
                     setRestaurants(data);
                     setFilteredRestaurants(data); // Initialize filtered data
                 })

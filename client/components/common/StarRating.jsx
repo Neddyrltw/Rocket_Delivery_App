@@ -30,12 +30,10 @@ const StarRating = ({ maxStars = 5, initialRating = 0, orderId, onRatingChange }
                 body: JSON.stringify({ restaurant_rating: newRating }),
             });
 
-            console.log('Response status:', response.status);
 
             if (!response.ok) {
                 console.error('Failed to update rating: ', await response.json());
             } else {
-                console.log('Rating updated successfully: ,',  await response.json());
             }
 
         } catch (error) {
@@ -49,7 +47,6 @@ const StarRating = ({ maxStars = 5, initialRating = 0, orderId, onRatingChange }
         // Adds 1 to convert 0-based indexing
         const newRating = index + 1;
 
-        console.log('Star pressed, updating rating to:', newRating);
 
         // Update state
         setRating(newRating); 

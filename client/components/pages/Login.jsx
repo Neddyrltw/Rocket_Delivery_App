@@ -30,7 +30,6 @@ const Login = () => {
 
     try {
       const user = await login(email, password);
-      console.log('User: ', user);
       if (user.customer_id && !user.courier_id) {
         setAccountType('customer');
       } else if (user.courier_id && !user.customer_id) {
@@ -66,7 +65,7 @@ const Login = () => {
       setPassword('');
     }, [])
   );
-  
+
   const showError = (message) => {
     setErrorMessage(message);
     setTimeout(() => {
