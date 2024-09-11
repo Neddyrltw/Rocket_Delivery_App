@@ -8,7 +8,6 @@ import {
     Dimensions,
     Alert
 } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faUserLarge, faTaxi } from '@fortawesome/free-solid-svg-icons';
@@ -24,21 +23,21 @@ const SelectAccountType = () => {
     const navigation = useNavigation();
 
 
-const handleSelectAccountType = async (type) => {
-    try {
-        await setAccountType(type);
-        await AsyncStorage.setItem('accountType', type);
-        navigation.navigate(type === 'Customer' ? 'MainCustomerScreen' : 'MainCourierScreen');
-    } catch (err) {
-        console.error('Error setting account type: ', err);
-        setErrorMessage('Failed to set account type. Please try again.');
-        Alert.alert('Error', 'Failed to set account type. Please try again.');
+    const handleSelectAccountType = async (type) => {
+        try {
+            const formattedAccountType = type.toLowerCase(); // Convert type to lowercase
+            await setAccountType(formattedAccountType);
+            console.log('Type: ', type);
+            console.log(`Navigating to ${formattedAccountType === 'customer' ? 'MainCustomerScreen' : 'MainCourierScreen'}`);
+            navigation.navigate(formattedAccountType === 'customer' ? 'MainCustomerScreen' : 'MainCourierScreen');
+        } catch (err) { 
+            console.error('Error setting account type: ', err);
+            Alert.alert('Error', 'Failed to set account type. Please try again.');
+        }
     }
 
-}
-
-// Calculate icon size dynamically
-const iconSize = screenWidth * 0.25; // 25% of the screen width
+    // Calculate icon size dynamically
+    const iconSize = screenWidth * 0.25; // 25% of the screen width
 
     return (
         <SafeAreaView style={styles.wrapper}>

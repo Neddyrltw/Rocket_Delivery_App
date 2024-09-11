@@ -1,70 +1,69 @@
-import React, {
-  createContext,
-  useState,
-  useEffect, 
-  useContext
-} from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { createContext, useState, useContext } from 'react';
+import Constants from 'expo-constants';
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [userState, setUserState] = useState({
+    accountType: '',
+    customer_id: null,
+    courier_id: null,
+    user_id: null,
+  });
 
-  useEffect(() => {
-    const loadUser = async () => {
+  const apiUrl = Constants.expoConfig?.extra?.apiUrl;
 
-      try { 
-        const storedUser = await AsyncStorage.getItem('userData');
-        console.log('Raw user data from AsyncStorage:', storedUser);
+  const login = async (email, password) => {
 
-        if (storedUser) {
-          const parsedUser = JSON.parse(storedUser);
-          console.log('Loaded user from AsyncStorage:', parsedUser);
-          setUser(parsedUser);
-        } else {
-          console.log('No user data found in AsyncStorage');        }
-      } catch (error) {
-        console.error('Failed to load user data:', error);
+    try {
+      const response = await fetch(`${apiUrl}/api/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      console.log("Response status:", response.status);
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-    };
 
-    loadUser();
-
-  }, []);
-
-  const login = async (userData) => {
-    try {
-      setUser(userData);
-      await AsyncStorage.setItem('userData', JSON.stringify(userData));
+      const data = await response.json();
+      console.log("Server response data:", data);
+      if (data.success) {
+        const user = {
+          user_id: data.user_id,
+          customer_id: data.customer_id,
+          courier_id: data.courier_id,
+        };
+        setUserState(user);
+        return user;
+      } else {
+        throw new Error('Login failed');
+      }
     } catch (error) {
-      console.error('Failed to save user data:', error);
-    }
-  };
-  
-  const logout = async () => {
-    try {
-      setUser(null);
-      await AsyncStorage.removeItem('userData');
-    } catch (error) {
-      console.error('Failed to remove user data:', error);
+      console.error('Login error:', error);
+      throw error;
     }
   };
 
-  // Update account type
-  const setAccountType = async (type) => {
-    try {
-      const updatedUser = { ...user, accountType: type};
-      setUser(updatedUser);
-      await AsyncStorage.setItem('userData', JSON.stringify(updatedUser));
-      console.log('Account type set to:', type); // Debug line
-    } catch (err) {
-      console.error('Failed to set account type: ', err);
-    }
+  const setAccountType = (type) => {
+    setUserState((prevState) => ({ ...prevState, accountType: type }));
+  }
+
+  const logout = () => {
+    setUserState({
+      accountType: '',
+      customer_id: null,
+      courier_id: null,
+      user_id: null,
+    });
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, setAccountType }}>
+    <AuthContext.Provider value={{ userState, login, logout, setAccountType }}>
       {children}
     </AuthContext.Provider>
   );

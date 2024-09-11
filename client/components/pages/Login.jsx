@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import {
-  Alert,
   Image,
   SafeAreaView,
   StyleSheet,
@@ -10,10 +9,9 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import Constants from 'expo-constants';
 import MyAppHeaderText from '../ui/MyAppHeaderText';
 import logo from '../../assets/logo.png';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/AuthContext'; 
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -21,61 +19,45 @@ const Login = () => {
   const [errorMessage, setErrorMessage] = useState('');
 
   const navigation = useNavigation();
-  const apiUrl = Constants.expoConfig?.extra?.apiUrl;
-  const { login, setAccountType } = useAuth();  // Access login from AuthContext
+  const { login, userState, setAccountType } = useAuth(); 
 
+  // User presss 'login', validation occurs
   const handleLoginPress = async () => {
-    
     if (!email || !password) {
-      showError('Please enter valid email and password.');
+      showError('Please enter a valid email and password.');
       return;
     }
 
     try {
-      const response = await fetch(`${apiUrl}/api/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        const user = {
-          user_id: data.user_id,
-          customer_id: data.customer_id,
-          courier_id: data.courier_id,
-        };
-
-        await login(user);  // Use login from AuthContext
-        Alert.alert('Success', 'Logged in successfully!');
-        setErrorMessage('');
-        
-        console.log('customer_id:', data.customer_id);
-        console.log('courier_id:', data.courier_id);
-
-        // Navigate based on user role
-        if (data.customer_id && !data.courier_id) {
-           await setAccountType('customer');
-          navigation.navigate('MainStack', { screen: 'MainCustomerPage' });
-        } else if (data.courier_id && !data.customer_id) {
-          await setAccountType('courier');
-          navigation.navigate('MainStack', { screen: 'MainCourierScreen'});
-        } else if (data.customer_id && data.courier_id) {
-          navigation.navigate('MainStack', {screen: 'SelectAccountType'});
-        } else {
-          showError('No valid accounty type found');
-        }
+      const user = await login(email, password);
+      console.log('User: ', user);
+      if (user.customer_id && !user.courier_id) {
+        setAccountType('customer');
+      } else if (user.courier_id && !user.customer_id) {
+        setAccountType('courier');
+      } else if (user.customer_id && user.courier_id) {
+        setAccountType(''); 
+        navigation.navigate('MainStack', { screen: 'SelectAccountType' });
       } else {
-        showError('Invalid email or password.');
+        showError('No valid account type found');
       }
     } catch (error) {
-      console.error('Error during login: ', error);
       showError('Something went wrong. Please try again.');
     }
   };
+
+  useEffect(() => {
+    if (userState && userState.customer_id || userState.courier_id) {
+      const { accountType, customer_id, courier_id } = userState;
+      if (accountType === 'customer' && customer_id) {
+        navigation.navigate('MainStack', { screen: 'MainCustomerScreen' });
+      } else if (accountType === 'courier' && courier_id) {
+        navigation.navigate('MainStack', { screen: 'MainCourierScreen' });
+      } else if (accountType === '') {
+        navigation.navigate('MainStack', { screen: 'SelectAccountType' });
+      }
+    }
+  }, [userState]);
 
   const showError = (message) => {
     setErrorMessage(message);
@@ -83,7 +65,7 @@ const Login = () => {
       setErrorMessage('');
     }, 3000);
   };
-  
+
   return (
     <SafeAreaView style={styles.wrapper}>
       <View style={styles.logoContainer}>

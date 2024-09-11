@@ -18,10 +18,9 @@ import Header from './components/ui/Header';
 import Footer from './components/ui/Footer';
 import SelectAccountType from './components/pages/SelectAccountType';
 import AccountPage from './components/pages/AccountPage';
-import RestaurantCard from './components/ui/RestaurantCard';
 
 const AuthStack = createNativeStackNavigator();
-const MainStack = createNativeStackNavigator();
+const AppStack = createNativeStackNavigator();
 
 export default function App() {
   const [fontsLoaded, setFontsLoaded] = useState(false);
@@ -44,12 +43,12 @@ export default function App() {
     <AuthProvider>
       <NavigationContainer>
         {/* Root Navigator */}
-        <MainStack.Navigator screenOptions={{ headerShown: false }}>
+        <AppStack.Navigator screenOptions={{ headerShown: false }}>
           {/* Authentication flow */}
-          <MainStack.Screen name="AuthStack" component={AuthFlow} />
+          <AppStack.Screen name="AuthStack" component={AuthFlow} />
           {/* Main app flow */}
-          <MainStack.Screen name="MainStack" component={MainFlow} />
-        </MainStack.Navigator>
+          <AppStack.Screen name="MainStack" component={MainFlow} />
+        </AppStack.Navigator>
       </NavigationContainer>
     </AuthProvider>
   );
@@ -66,26 +65,26 @@ const AuthFlow = () => {
 
 // Main App Flow Stack
 const MainFlow = () => {
-  const { user } = useAuth();  // get user data
+  const { userState } = useAuth(); 
+  console.log("User state in MainFlow:", userState);
 
   return (
-    <MainStack.Navigator screenOptions={{ headerShown: false }}>
-      {user?.accountType ? (
+    <AppStack.Navigator screenOptions={{ headerShown: false }}>
+      {userState?.accountType ? (
         <>
-          <MainStack.Screen name="MainCustomerScreen" component={MainCustomerScreen} />
-          <MainStack.Screen name="OrderPage" component={OrderPageScreen} />
-          <MainStack.Screen name="OrderHistory" component={OrderHistoryScreen} />
-          <MainStack.Screen name="MainCourierScreen" component={MainCourierScreen} />
-          <MainStack.Screen name="AccountScreen" component={AccountScreen} />
+          <AppStack.Screen name="MainCustomerScreen" component={MainCustomerScreen} />
+          <AppStack.Screen name="OrderPage" component={OrderPageScreen} />
+          <AppStack.Screen name="OrderHistory" component={OrderHistoryScreen} />
+          <AppStack.Screen name="MainCourierScreen" component={MainCourierScreen} />
+          <AppStack.Screen name="AccountScreen" component={AccountScreen} />
         </>
       ) : (
-        <MainStack.Screen name="SelectAccountType" component={SelectAccountType} />
+        <AppStack.Screen name="SelectAccountType" component={SelectAccountType} />
       )}
-    </MainStack.Navigator>
+    </AppStack.Navigator>
   );
 };
 
-// Look into conditional rendering for header/footer
 const MainCustomerScreen = ({ navigation }) => {
     return(
         <SafeAreaView style={styles.mainContainer}>
