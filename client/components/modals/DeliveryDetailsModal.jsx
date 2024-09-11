@@ -10,7 +10,6 @@ import {
 } from 'react-native';
 
 import Constants from 'expo-constants';
-import MyAppHeaderText from '../ui/MyAppHeaderText';
 
 const DeliveryDetailsModal = ({ visible, onClose, deliveryDetails }) => {
 

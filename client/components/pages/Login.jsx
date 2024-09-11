@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import {
   Image,
   SafeAreaView,
@@ -59,6 +59,14 @@ const Login = () => {
     }
   }, [userState]);
 
+  useFocusEffect(
+    React.useCallback(() => {
+      // Clear inputs when navigating to the login screen
+      setEmail('');
+      setPassword('');
+    }, [])
+  );
+  
   const showError = (message) => {
     setErrorMessage(message);
     setTimeout(() => {

@@ -2,38 +2,27 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View, Dimensions } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faBurger, faClockRotateLeft, faUser, faTruck } from '@fortawesome/free-solid-svg-icons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useAuth } from '../contexts/AuthContext';
 
 const Footer = ({ navigation }) => {
-    const [accountType, SetAccountType] = useState(null);
+const { width } = Dimensions.get('window'); // get screen width
+const iconSize = width * 0.05; // icon size as 5% of the screen width
 
-    const { width } = Dimensions.get('window'); // get screen width
-    const iconSize = width * 0.05; // icon size as 5% of the screen width
+const { userState } = useAuth();
+const { accountType } = userState;
 
-    useEffect(() => {
-        const fetchAccountType = async () => {
-            const userString = await AsyncStorage.getItem('userData');
-            if (userString) {
-                const { accountType } = JSON.parse(userString)
-                SetAccountType(accountType.toLowerCase());
-            }
-        };
-
-        fetchAccountType();
-    }, []);
-
-    return (
-        <View style={styles.footer}>
-          {accountType === 'customer' && (
-            <>
-              <View style={styles.iconContainer}>
-                <TouchableOpacity
-                  style={styles.button}
-                  onPress={() => navigation.navigate('MainCustomerScreen')}
-                >
-                  <FontAwesomeIcon
-                  style={styles.icon}
-                  size={iconSize}
+  return (
+      <View style={styles.footer}>
+        {accountType === 'customer' && (
+          <>
+            <View style={styles.iconContainer}>
+              <TouchableOpacity
+                style={styles.button}
+                onPress={() => navigation.navigate('MainCustomerScreen')}
+              >
+                <FontAwesomeIcon
+                style={styles.icon}
+                size={iconSize}
                   icon={faBurger} />
                   <Text style={styles.subtitle}>Restaurants</Text>
                 </TouchableOpacity>
@@ -82,7 +71,7 @@ const Footer = ({ navigation }) => {
               <Text style={styles.subtitle}>Account</Text>
             </TouchableOpacity>
           </View>
-        </View>
+      </View>
       );
     };
 

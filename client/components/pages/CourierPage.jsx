@@ -1,11 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import { Text, View, SafeAreaView, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
+import {
+  Text,
+  View,
+  SafeAreaView,
+  FlatList,
+  StyleSheet,
+  TouchableOpacity
+} from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faMagnifyingGlassPlus } from '@fortawesome/free-solid-svg-icons';
-import Constants from 'expo-constants';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import { useAuth } from '../contexts/AuthContext';
 import DeliveryDetailsModal from '../modals/DeliveryDetailsModal';
+import Constants from 'expo-constants';
+
 
 const CourierPage = () => {
   const [deliveries, setDeliveries] = useState([]);
@@ -13,45 +20,39 @@ const CourierPage = () => {
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedDelivery, setSelectedDelivery] = useState(null);
+
+  const { userState } = useAuth();
   
   const apiUrl = Constants.expoConfig?.extra?.apiUrl;
 
   useEffect(() => {
     const fetchDeliveries = async () => {
-
       try {
-        // Fetch user data from AsyncStorage
-        const userData = await AsyncStorage.getItem('userData');
+        const { courier_id } = userState;
 
-        if (userData) {
-          const { courier_id } = JSON.parse(userData);
-          
-          if (courier_id) {
-            const type = 'courier';
+        if (courier_id) {
+          const type = 'courier';
 
-            // Fetch deliveries for the courier
-            const response = await fetch(`${apiUrl}/api/orders?id=${courier_id}&type=${type}`, {
-              method: 'GET',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-            });
+          // Fetch deliveries for the courier
+          const response = await fetch(`${apiUrl}/api/orders?id=${courier_id}&type=${type}`, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
 
-            if (!response.ok) {
-              throw new Error(`Failed to fetch deliveries, status: ${response.status}`);
-            }
-
-            const data = await response.json();
-
-            // Sort deliveries by date descending
-            const sortedDeliveries = data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-            setDeliveries(sortedDeliveries);
-
-          } else {
-            throw new Error('Courier ID not found in user data');
+          if (!response.ok) {
+            throw new Error(`Failed to fetch deliveries, status: ${response.status}`);
           }
+
+          const data = await response.json();
+
+          // Sort deliveries by date descending
+          const sortedDeliveries = data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+          setDeliveries(sortedDeliveries);
+
         } else {
-          throw new Error('User data not found in AsyncStorage');
+          throw new Error('Courier ID not found in user state');
         }
       } catch (error) {
         console.error('Fetch error: ', error);
@@ -63,7 +64,7 @@ const CourierPage = () => {
     };
 
     fetchDeliveries();
-  }, []);
+  }, [userState, apiUrl]); 
 
   const trimmedAddress = (fullAddress) => {
     return fullAddress.split(',')[0];
