@@ -1,5 +1,12 @@
 import React from 'react';
-import { Dimensions, View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import {
+    Dimensions,
+    View,
+    Text,
+    Image,
+    StyleSheet,
+    TouchableOpacity
+} from 'react-native';
 import { getRestaurantImage } from './RestaurantImages';
 import { useNavigation } from '@react-navigation/native';
 
@@ -8,6 +15,7 @@ const { width } = Dimensions.get('window');
 
 const RestaurantCard = ({ restaurant }) => {
     const navigation = useNavigation();
+    const image = getRestaurantImage(restaurant.id);
 
     const handlePress = () => {
         navigation.navigate('OrderPage', { restaurant });
@@ -16,7 +24,7 @@ const RestaurantCard = ({ restaurant }) => {
     return (
         <TouchableOpacity style={styles.cardContainer} onPress={handlePress}>
             <View style={styles.imageContainer}>
-                <Image source={getRestaurantImage(restaurant.id)} style={styles.image} />
+                <Image source={image} style={styles.image} />
             </View>
             <View style={styles.infoContainer}>
                 <Text style={styles.name}>{restaurant.name}</Text>

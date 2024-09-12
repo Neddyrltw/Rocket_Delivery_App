@@ -3,21 +3,24 @@ import {
     ActivityIndicator,
     SafeAreaView,
     StyleSheet,
-    View
 } from 'react-native';
 import * as Font from 'expo-font';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { AuthProvider } from './components/contexts/AuthContext';
-
+import { useAuth } from './components/contexts/AuthContext';
 import Login from './components/pages/Login';
 import Restaurants from './components/pages/Restaurants';
 import OrderPage from './components/pages/OrderPage';
 import OrderHistory from './components/pages/OrderHistory';
+import CourierPage from './components/pages/CourierPage';
 import Header from './components/ui/Header';
 import Footer from './components/ui/Footer';
+import SelectAccountType from './components/pages/SelectAccountType';
+import AccountPage from './components/pages/AccountPage';
 
-const Stack = createNativeStackNavigator();
+const AuthStack = createNativeStackNavigator();
+const AppStack = createNativeStackNavigator();
 
 export default function App() {
   const [fontsLoaded, setFontsLoaded] = useState(false);
@@ -38,19 +41,51 @@ export default function App() {
 
   return (
     <AuthProvider>
-        <NavigationContainer>
-            <Stack.Navigator screenOptions={{ headerShown: false}}>
-                <Stack.Screen name="Login" component={Login} />
-                <Stack.Screen name="Main" component={MainScreen} />
-                <Stack.Screen name="OrderPage" component={OrderPageScreen} />
-                <Stack.Screen name="OrderHistory" component={OrderHistoryScreen} />
-            </Stack.Navigator>
-        </NavigationContainer>
+      <NavigationContainer>
+        {/* Root Navigator */}
+        <AppStack.Navigator screenOptions={{ headerShown: false }}>
+          {/* Authentication flow */}
+          <AppStack.Screen name="AuthStack" component={AuthFlow} />
+          {/* Main app flow */}
+          <AppStack.Screen name="MainStack" component={MainFlow} />
+        </AppStack.Navigator>
+      </NavigationContainer>
     </AuthProvider>
   );
 }
 
-const MainScreen = ({ navigation }) => {
+// Authentication Flow Stack
+const AuthFlow = () => {
+  return (
+    <AuthStack.Navigator screenOptions={{ headerShown: false }}>
+      <AuthStack.Screen name="Login" component={Login} />
+    </AuthStack.Navigator>
+  );
+};
+
+// Main App Flow Stack
+const MainFlow = () => {
+  const { userState } = useAuth(); 
+  console.log("User state in MainFlow:", userState);
+
+  return (
+    <AppStack.Navigator screenOptions={{ headerShown: false }}>
+      {userState?.accountType ? (
+        <>
+          <AppStack.Screen name="MainCustomerScreen" component={MainCustomerScreen} />
+          <AppStack.Screen name="OrderPage" component={OrderPageScreen} />
+          <AppStack.Screen name="OrderHistory" component={OrderHistoryScreen} />
+          <AppStack.Screen name="MainCourierScreen" component={MainCourierScreen} />
+          <AppStack.Screen name="AccountScreen" component={AccountScreen} />
+        </>
+      ) : (
+        <AppStack.Screen name="SelectAccountType" component={SelectAccountType} />
+      )}
+    </AppStack.Navigator>
+  );
+};
+
+const MainCustomerScreen = ({ navigation }) => {
     return(
         <SafeAreaView style={styles.mainContainer}>
             <Header />
@@ -78,6 +113,26 @@ const OrderHistoryScreen = ( {navigation }) => {
           <Footer navigation={navigation}/>
       </SafeAreaView>
   );
+}
+
+const MainCourierScreen = ({ navigation }) => {
+  return (
+    <SafeAreaView style={styles.mainContainer}>
+      <Header />
+      <CourierPage />
+      <Footer navigation={navigation} />
+    </SafeAreaView>
+  );
+}
+
+const AccountScreen = ({ navigation }) => {
+  return (
+    <SafeAreaView style={styles.mainContainer}>
+      <Header />
+      <AccountPage />
+      <Footer navigation={navigation} />
+    </SafeAreaView>
+  )
 }
 
 const styles = StyleSheet.create({

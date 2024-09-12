@@ -9,7 +9,8 @@ npm-debug.*
 *.mobileprovision
 *.orig.*
 web-build/
-
+tsconfig.json
+ROCKETDELIVERYPROJECT
 # macOS
 .DS_Store
 

@@ -67,8 +67,8 @@ const Header = () => {
       zIndex: 1,
     },
     logo: {
-      height: '150%',
-      maxWidth: '50%',
+      height: '90%',
+      maxWidth: '40%',
       resizeMode: 'contain',
     },
   });

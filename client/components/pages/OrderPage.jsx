@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import {
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View
+} from 'react-native';
+import { useAuth } from '../contexts/AuthContext';
 import Constants from 'expo-constants';
 import OrderCard from '../ui/OrderCard';
 import OrderConfirmation from '../modals/OrderConfirmation';
@@ -11,19 +18,16 @@ const OrderPage = ({ route }) => {
     const [menuItems, setMenuItems] = useState([]);
     const [quantities, setQuantities] = useState({});
     const [modalVisibility, setModalVisibility] = useState(false);
-    const [customerId, setCustomerId] = useState(null);
+
+    const { userState } = useAuth();
+    const { customer_id: customerId } = userState;
+
     const apiUrl = Constants.expoConfig?.extra?.apiUrl; 
 
     useEffect(() => {
         const fetchData = async () => {
+
             try {
-                // Fetch customer id
-                const userData = await AsyncStorage.getItem('user');
-                if (userData) {
-                    const { customer_id } = JSON.parse(userData);
-                    setCustomerId(customer_id);
-                }
-    
                 // Fetch menu items
                 const response = await fetch(`${apiUrl}/api/products?restaurant=${restaurant.id}`);
                 const data = await response.json();

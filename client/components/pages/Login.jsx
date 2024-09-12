@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
-import { useNavigation } from '@react-navigation/native';
+import React, { useState, useEffect } from 'react';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import {
-  Alert,
   Image,
   SafeAreaView,
   StyleSheet,
@@ -10,11 +9,9 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import Constants from 'expo-constants';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import MyAppHeaderText from '../ui/MyAppHeaderText';
 import logo from '../../assets/logo.png';
-
+import { useAuth } from '../contexts/AuthContext'; 
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -22,54 +19,60 @@ const Login = () => {
   const [errorMessage, setErrorMessage] = useState('');
 
   const navigation = useNavigation();
-  const apiUrl = Constants.expoConfig?.extra?.apiUrl;
+  const { login, userState, setAccountType } = useAuth(); 
 
-
-  const handleLoginPress = () => {
+  // User presss 'login', validation occurs
+  const handleLoginPress = async () => {
     if (!email || !password) {
-      showError('Please enter valid email and password.')
+      showError('Please enter a valid email and password.');
       return;
     }
 
-  fetch(`${apiUrl}/api/login`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ email, password }),
-  })
-
-  .then(response => response.json())
-  .then(async data => {
-    if (data.success) {
-      const userData = {
-        user_id: data.user_id,
-        customer_id: data.customer_id,
-        courier_id: data.courier_id,
-      };
-
-      await AsyncStorage.setItem('user', JSON.stringify(userData));
-      console.log('User logged in:', userData);
-      Alert.alert('Success', 'Logged in successfully!');
-      setErrorMessage('');
-      navigation.navigate('Main');
-    } else {
-      showError('Invalid email or password.')
+    try {
+      const user = await login(email, password);
+      if (user.customer_id && !user.courier_id) {
+        setAccountType('customer');
+      } else if (user.courier_id && !user.customer_id) {
+        setAccountType('courier');
+      } else if (user.customer_id && user.courier_id) {
+        setAccountType(''); 
+        navigation.navigate('MainStack', { screen: 'SelectAccountType' });
+      } else {
+        showError('No valid account type found');
+      }
+    } catch (error) {
+      showError('Something went wrong. Please try again.');
     }
-  })
-  .catch (error => {
-    console.error('Error during login: ', error)
-    showError('Something went wrong. Please try again.')
-  });
-};
+  };
 
-const showError = (message) => {
-  setErrorMessage(message);
-  setTimeout(() => {
-    setErrorMessage('');
-  }, 1000);
-};
-  
+  useEffect(() => {
+    if (userState && userState.customer_id || userState.courier_id) {
+      const { accountType, customer_id, courier_id } = userState;
+      if (accountType === 'customer' && customer_id) {
+        navigation.navigate('MainStack', { screen: 'MainCustomerScreen' });
+      } else if (accountType === 'courier' && courier_id) {
+        navigation.navigate('MainStack', { screen: 'MainCourierScreen' });
+      } else if (accountType === '') {
+        navigation.navigate('MainStack', { screen: 'SelectAccountType' });
+      }
+    }
+  }, [userState]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      // Clear inputs when navigating to the login screen
+      setEmail('');
+      setPassword('');
+    }, [])
+  );
+
+  const showError = (message) => {
+    setErrorMessage(message);
+    setTimeout(() => {
+      setErrorMessage('');
+    }, 3000);
+  };
+
   return (
     <SafeAreaView style={styles.wrapper}>
       <View style={styles.logoContainer}>
@@ -98,7 +101,7 @@ const showError = (message) => {
               style={styles.input}
               onChangeText={setPassword}
               value={password}
-              placeholder='●●●●●●●●'
+              placeholder='Enter your password here'
               secureTextEntry
             />
           </View>

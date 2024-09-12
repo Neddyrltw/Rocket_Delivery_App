@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 
 import RestaurantCard from '../ui/RestaurantCard';
+import useUserData from '../contexts/UserContext';
 
 const Restaurants = () => {
     const [restaurants, setRestaurants] = useState([]);
@@ -17,7 +18,9 @@ const Restaurants = () => {
     const [rating, setRating] = useState(null);
     const [price, setPrice] = useState(null);
 
+    const { userData, loading, error } = useUserData();
     const apiUrl = Constants.expoConfig?.extra?.apiUrl;
+
 
     const ratingOptions = [
         { key: 'clear', label: 'Clear Selection' }, // Add clear option
@@ -36,14 +39,16 @@ const Restaurants = () => {
     ];
 
     useEffect(() => {
-        fetch(`${apiUrl}/api/restaurants`)
-            .then((response) => response.json())
-            .then((data) => {
-                setRestaurants(data);
-                setFilteredRestaurants(data); // Initialize filtered data
-            })
-            .catch((error) => console.error('Error fetching restaurants: ', error));
-    }, []);
+        if (!loading && userData) {
+            fetch(`${apiUrl}/api/restaurants`)
+                .then((response) => response.json())
+                .then((data) => {
+                    setRestaurants(data);
+                    setFilteredRestaurants(data); // Initialize filtered data
+                })
+                .catch((error) => console.error('Error fetching restaurants: ', error));
+        }
+    }, [userData, loading]);
 
     useEffect(() => {
         filterRestaurants(); // Trigger filter when rating or price changes
@@ -78,6 +83,14 @@ const Restaurants = () => {
             setPrice(option.key);
         }
     };
+
+    if (loading) {
+        return <Text>Loading user data...</Text>; // Show loading state
+    }
+
+    if (error) {
+        return <Text>Error fetching user data: {error.message}</Text>; // Show error state
+    }
 
     return (
         <SafeAreaView style={styles.container}>
